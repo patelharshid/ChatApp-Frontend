@@ -1,4 +1,4 @@
-import 'package:chatapp/app/UI/chatPage.dart';
+import 'package:chatapp/app/UI/chat/chatPage.dart';
 import 'package:flutter/material.dart';
 
 class TabSection extends StatefulWidget {

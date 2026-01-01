@@ -1,4 +1,4 @@
-import 'package:chatapp/app/UI/chatDetailPage.dart';
+import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
 import 'package:flutter/material.dart';
 
 class ChatPage extends StatefulWidget {

@@ -1,4 +1,4 @@
-import 'package:chatapp/app/UI/otpVerificationPage.dart';
+import 'package:chatapp/app/UI/auth/otpVerificationPage.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 

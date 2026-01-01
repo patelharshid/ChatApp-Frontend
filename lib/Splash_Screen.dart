@@ -1,6 +1,6 @@
-import 'package:chatapp/app/UI/homePage.dart';
-import 'package:chatapp/app/UI/loginPage.dart';
-import 'package:chatapp/app/UI/profileSetupPage.dart';
+import 'package:chatapp/app/UI/auth/homePage.dart';
+import 'package:chatapp/app/UI/auth/loginPage.dart';
+import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:flutter/material.dart';
 

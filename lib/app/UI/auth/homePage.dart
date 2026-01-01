@@ -1,6 +1,6 @@
 import 'package:chatapp/Splash_Screen.dart';
-import 'package:chatapp/app/UI/contactPage.dart';
-import 'package:chatapp/app/UI/tabSection.dart';
+import 'package:chatapp/app/UI/chat/contactPage.dart';
+import 'package:chatapp/app/UI/auth/tabSection.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:flutter/material.dart';
 
@@ -52,6 +52,16 @@ class _ChatHomePageState extends State<Homepage> {
               }
             },
             itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'profile',
+                child: Row(
+                  children: [
+                    Icon(Icons.person, color: Colors.black87),
+                    SizedBox(width: 10),
+                    Text("Profile"),
+                  ],
+                ),
+              ),
               PopupMenuItem(
                 value: 'profile',
                 child: Row(

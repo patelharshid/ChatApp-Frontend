@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:chatapp/app/UI/profileSetupPage.dart';
+import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
