@@ -14,7 +14,7 @@ class Homepage extends StatefulWidget {
 class _ChatHomePageState extends State<Homepage> {
   void logout() {
     CommonService.clearSharedPreferences();
-    Navigator.pushReplacement(
+    Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const SplashScreen()),
     );

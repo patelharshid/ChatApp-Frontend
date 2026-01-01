@@ -58,7 +58,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
       CommonService.setUserId(res['data']['userId'].toString());
 
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const Homepage()),
       );

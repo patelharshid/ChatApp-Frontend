@@ -76,7 +76,7 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
 
       if (!mounted) return;
 
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
       );

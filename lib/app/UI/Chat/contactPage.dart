@@ -1,3 +1,4 @@
+import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
@@ -62,11 +63,13 @@ class _ContactPageState extends State<ContactPage> {
                   onPressed: selectedIndexes.length < 2
                       ? null
                       : () {
-                          final selectedUsers = selectedIndexes
-                              .map((i) => users[i])
-                              .toList();
-
-                          print("Create group with: $selectedUsers");
+                          selectedIndexes.map((i) => users[i]).toList();
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const GroupPage(),
+                            ),
+                          );
                         },
                 ),
               ],
@@ -87,7 +90,12 @@ class _ContactPageState extends State<ContactPage> {
                       "New Group",
                       style: TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const GroupPage()),
+                      );
+                    },
                   );
                 }
 

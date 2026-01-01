@@ -35,17 +35,17 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (token == null || token.isEmpty) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),
       );
     } else if (userId == null || userId.isEmpty) {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
       );
     } else {
-      Navigator.pushReplacement(
+      Navigator.push(
         context,
         MaterialPageRoute(builder: (_) => const Homepage()),
       );
