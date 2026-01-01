@@ -1,6 +1,7 @@
 import 'package:chatapp/Splash_Screen.dart';
 import 'package:chatapp/app/UI/chat/contactPage.dart';
 import 'package:chatapp/app/UI/auth/tabSection.dart';
+import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ class _ChatHomePageState extends State<Homepage> {
       backgroundColor: Colors.grey.shade100,
 
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.white,
         elevation: 1,
         title: const Text(
@@ -45,20 +47,20 @@ class _ChatHomePageState extends State<Homepage> {
             ),
             icon: const Icon(Icons.settings, color: Colors.black87),
             onSelected: (value) {
-              if (value == 'profile') {
-                print("profile");
+              if (value == 'group') {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> const GroupPage()));
               } else if (value == 'logout') {
                 logout();
               }
             },
             itemBuilder: (context) => const [
               PopupMenuItem(
-                value: 'profile',
+                value: 'group',
                 child: Row(
                   children: [
-                    Icon(Icons.person, color: Colors.black87),
+                    Icon(Icons.group_add, color: Colors.black87),
                     SizedBox(width: 10),
-                    Text("Profile"),
+                    Text("New Group"),
                   ],
                 ),
               ),
