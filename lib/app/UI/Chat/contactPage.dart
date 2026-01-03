@@ -16,8 +16,6 @@ class _ContactPageState extends State<ContactPage> {
   bool isLoading = true;
   List<UserDetailModel> users = [];
 
-  Set<int> selectedIndexes = {};
-
   @override
   void initState() {
     super.initState();
@@ -39,41 +37,7 @@ class _ContactPageState extends State<ContactPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: selectedIndexes.isEmpty
-            ? const Text("Select Contact")
-            : Text("${selectedIndexes.length} selected"),
-
-        leading: selectedIndexes.isEmpty
-            ? null
-            : IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: () {
-                  setState(() {
-                    selectedIndexes.clear();
-                  });
-                },
-              ),
-
-        actions: selectedIndexes.isEmpty
-            ? []
-            : [
-                IconButton(
-                  icon: const Icon(Icons.group_add),
-                  onPressed: selectedIndexes.length < 2
-                      ? null
-                      : () {
-                          selectedIndexes.map((i) => users[i]).toList();
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const GroupPage(),
-                            ),
-                          );
-                        },
-                ),
-              ],
-      ),
+      appBar: AppBar(title: const Text("Select Contact")),
 
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -115,10 +79,8 @@ class _ContactPageState extends State<ContactPage> {
 
                 final userIndex = index - 2;
                 final user = users[userIndex];
-                final isSelected = selectedIndexes.contains(userIndex);
 
                 return ListTile(
-                  tileColor: isSelected ? Colors.green.withOpacity(0.15) : null,
                   leading: Stack(
                     children: [
                       CircleAvatar(
@@ -129,21 +91,6 @@ class _ContactPageState extends State<ContactPage> {
                             ? const Icon(Icons.person)
                             : null,
                       ),
-
-                      if (isSelected)
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: CircleAvatar(
-                            radius: 10,
-                            backgroundColor: Colors.green,
-                            child: const Icon(
-                              Icons.check,
-                              size: 14,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
                     ],
                   ),
 
@@ -151,23 +98,7 @@ class _ContactPageState extends State<ContactPage> {
                   subtitle: Text(user.about ?? ""),
 
                   onTap: () {
-                    if (selectedIndexes.isNotEmpty) {
-                      setState(() {
-                        if (isSelected) {
-                          selectedIndexes.remove(userIndex);
-                        } else {
-                          selectedIndexes.add(userIndex);
-                        }
-                      });
-                    } else {
-                      print("Open chat with ${user.name}");
-                    }
-                  },
-
-                  onLongPress: () {
-                    setState(() {
-                      selectedIndexes.add(userIndex);
-                    });
+                    print("hello");
                   },
                 );
               },
