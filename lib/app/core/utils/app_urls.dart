@@ -9,4 +9,6 @@ class AppUrls {
   static String getUserById() => "$baseUrl/auth/getUserById";
 
   static String getAllUser() => "$baseUrl/auth";
+
+  static String getChatUsers() => "$baseUrl/chat";
 }
