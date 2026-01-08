@@ -37,7 +37,6 @@ class _ChatPageState extends State<ChatPage> {
 
   @override
   Widget build(BuildContext context) {
-
     if (isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -58,23 +57,32 @@ class _ChatPageState extends State<ChatPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => ChatDetailPage(
-                    userName: user.name,
-                  ),
+                  builder: (_) => ChatDetailPage(userName: user.name),
                 ),
               );
             },
             leading: CircleAvatar(
-              backgroundImage: user.profileUrl != null
-                  ? NetworkImage(user.profileUrl!)
-                  : null,
-              child: user.profileUrl == null
-                  ? const Icon(Icons.person)
-                  : null,
+              backgroundImage: NetworkImage(user.profileUrl),
             ),
             title: Text(user.name),
-            subtitle: Text(user.lastMessage ?? ""),
-            trailing: Text(DateUtil.formatTime(user.lastMessageTime!)),
+            subtitle: Row(
+              children: [
+                if (user.messageType == "SENT")
+                  const Icon(Icons.done_all, size: 16, color: Colors.blue),
+
+                if (user.messageType == "SENT") const SizedBox(width: 4),
+
+                Expanded(
+                  child: Text(
+                    user.lastMessage,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+
+            trailing: Text(DateUtil.formatTime(user.lastMessageTime)),
           ),
         );
       },
