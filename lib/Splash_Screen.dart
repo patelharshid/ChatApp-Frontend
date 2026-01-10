@@ -2,6 +2,7 @@ import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/UI/auth/loginPage.dart';
 import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -16,8 +17,6 @@ class _SplashScreenState extends State<SplashScreen>
   late AnimationController _animationController;
   late Animation<double> _scaleAnimation;
   late Animation<double> _fadeAnimation;
-
-  bool _showRetryOption = false;
 
   @override
   void initState() {
@@ -54,50 +53,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _initAnimations() {
     _animationController = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 1800),
       vsync: this,
     );
 
-    _scaleAnimation = Tween(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    _scaleAnimation = Tween(begin: 0.85, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOutBack),
     );
 
     _fadeAnimation = Tween(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
     );
 
     _animationController.forward();
-  }
-
-  Future<void> _initializeApp() async {
-    try {
-      await Future.wait([
-        Future.delayed(const Duration(milliseconds: 800)),
-        Future.delayed(const Duration(milliseconds: 600)),
-        Future.delayed(const Duration(milliseconds: 1000)),
-        Future.delayed(const Duration(milliseconds: 700)),
-      ]);
-
-      await Future.delayed(const Duration(milliseconds: 3000));
-
-      if (mounted) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginPage()),
-        );
-      }
-    } catch (_) {
-      if (mounted) {
-        Future.delayed(const Duration(seconds: 5), () {
-          if (mounted) setState(() => _showRetryOption = true);
-        });
-      }
-    }
-  }
-
-  void _retryInitialization() {
-    setState(() => _showRetryOption = false);
-    _initializeApp();
   }
 
   @override
@@ -110,14 +78,24 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.background,
+              AppColors.mid,
+              AppColors.primary,
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
         width: double.infinity,
-        decoration: _gradientBackground(),
         child: SafeArea(
           child: Column(
             children: [
-              Expanded(flex: 3, child: _logoWithAnimation()),
-              Expanded(flex: 1, child: _loadingOrRetry()),
-              _footerText(),
+              Expanded(flex: 3, child: _logo()),
+              Expanded(flex: 1, child: _loading()),
+              _footer(),
             ],
           ),
         ),
@@ -125,19 +103,11 @@ class _SplashScreenState extends State<SplashScreen>
     );
   }
 
-  BoxDecoration _gradientBackground() => const BoxDecoration(
-    gradient: LinearGradient(
-      colors: [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
-    ),
-  );
-
-  Widget _logoWithAnimation() {
+  Widget _logo() {
     return Center(
       child: AnimatedBuilder(
         animation: _animationController,
-        builder: (context, child) => Transform.scale(
+        builder: (_, __) => Transform.scale(
           scale: _scaleAnimation.value,
           child: Opacity(
             opacity: _fadeAnimation.value,
@@ -146,9 +116,9 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
                 _appIcon(),
                 const SizedBox(height: 30),
-                _titleText(),
+                _title(),
                 const SizedBox(height: 10),
-                _taglineText(),
+                _tagline(),
               ],
             ),
           ),
@@ -162,94 +132,53 @@ class _SplashScreenState extends State<SplashScreen>
       width: 110,
       height: 110,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(25),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: AppColors.primary.withValues(alpha: 0.4),
+            blurRadius: 25,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      child: const Icon(Icons.chat_bubble, color: Colors.blue, size: 60),
-    );
-  }
-
-  Widget _titleText() {
-    return const Text(
-      'ChatConnect',
-      style: TextStyle(
-        color: Colors.white,
-        fontSize: 30,
-        fontWeight: FontWeight.bold,
-        letterSpacing: 1.2,
+      child: const Icon(
+        Icons.chat_bubble_rounded,
+        color: AppColors.primary,
+        size: 60,
       ),
     );
   }
 
-  Widget _taglineText() {
-    return Text(
-      'Connect. Chat. Share.',
-      style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 16),
-    );
-  }
+  Widget _title() => const Text(
+    'ChatConnect',
+    style: TextStyle(
+      color: AppColors.colorWhite,
+      fontSize: 30,
+      fontWeight: FontWeight.bold,
+      letterSpacing: 1.3,
+    ),
+  );
 
-  Widget _loadingOrRetry() {
-    return _showRetryOption ? _retryWidget() : _loadingWidget();
-  }
+  Widget _tagline() => const Text(
+    'Connect. Chat. Share.',
+    style: TextStyle(color: AppColors.lightText, fontSize: 16),
+  );
 
-  Widget _loadingWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation(Colors.white),
-        ),
-        const SizedBox(height: 15),
-        Text(
-          'Initializing...',
-          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 16),
-        ),
-      ],
-    );
-  }
+  Widget _loading() => Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: const [
+      CircularProgressIndicator(color: AppColors.primary),
+      SizedBox(height: 15),
+      Text('Initializing...', style: TextStyle(color: AppColors.lightText)),
+    ],
+  );
 
-  Widget _retryWidget() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          'Connection timeout',
-          style: TextStyle(color: Colors.white.withOpacity(0.9)),
-        ),
-        const SizedBox(height: 20),
-        ElevatedButton(
-          onPressed: _retryInitialization,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.white,
-            foregroundColor: Colors.blue,
-            padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
-            ),
-          ),
-          child: const Text(
-            'Retry',
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _footerText() {
-    return const Padding(
-      padding: EdgeInsets.only(bottom: 20),
-      child: Text(
-        'Secure messaging for everyone',
-        style: TextStyle(color: Colors.white70, fontSize: 14),
-      ),
-    );
-  }
+  Widget _footer() => const Padding(
+    padding: EdgeInsets.only(bottom: 20),
+    child: Text(
+      'Secure messaging for everyone',
+      style: TextStyle(color: AppColors.lightText),
+    ),
+  );
 }

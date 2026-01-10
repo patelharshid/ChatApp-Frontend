@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/group/groupPage.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
@@ -37,72 +38,144 @@ class _ContactPageState extends State<ContactPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Select Contact")),
+      backgroundColor: AppColors.background,
+      appBar: AppBar(
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+
+        iconTheme: const IconThemeData(
+          color: AppColors.colorWhite,
+        ),
+
+        title: const Text(
+          "Select contact",
+          style: TextStyle(
+            color: AppColors.colorWhite,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
 
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : ListView.builder(
               itemCount: users.length + 2,
               itemBuilder: (context, index) {
                 if (index == 0) {
-                  return ListTile(
-                    leading: const CircleAvatar(
-                      backgroundColor: Colors.blue,
-                      child: Icon(Icons.group_add, color: Colors.white),
-                    ),
-                    title: const Text(
-                      "New Group",
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const GroupPage()),
-                      );
-                    },
-                  );
+                  return _newGroupTile();
                 }
 
                 if (index == 1) {
                   return const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     child: Text(
                       "Contacts on WhatsApp",
                       style: TextStyle(
+                        color: AppColors.lightText,
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: Colors.grey,
                       ),
                     ),
                   );
                 }
 
-                final userIndex = index - 2;
-                final user = users[userIndex];
-
-                return ListTile(
-                  leading: Stack(
-                    children: [
-                      CircleAvatar(
-                        backgroundImage: user.profileUrl != null
-                            ? NetworkImage(user.profileUrl!)
-                            : null,
-                        child: user.profileUrl == null
-                            ? const Icon(Icons.person)
-                            : null,
-                      ),
-                    ],
-                  ),
-
-                  title: Text(user.name ?? ""),
-                  subtitle: Text(user.about ?? ""),
-
-                  onTap: () {
-                    print("hello");
-                  },
-                );
+                final user = users[index - 2];
+                return _contactTile(user);
               },
             ),
+    );
+  }
+
+  Widget _newGroupTile() {
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => const GroupPage()),
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.group_add, color: AppColors.colorBlack),
+            ),
+            const SizedBox(width: 16),
+            const Text(
+              "New group",
+              style: TextStyle(
+                color: AppColors.colorWhite,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _contactTile(UserDetailModel user) {
+    return InkWell(
+      onTap: () {
+        debugPrint("Open chat with ${user.name}");
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: const BoxDecoration(
+          border: Border(
+            bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
+          ),
+        ),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundColor: AppColors.colorGrey,
+              backgroundImage: user.profileUrl != null
+                  ? NetworkImage(user.profileUrl!)
+                  : null,
+              child: user.profileUrl == null
+                  ? const Icon(Icons.person, color: AppColors.lightText)
+                  : null,
+            ),
+
+            const SizedBox(width: 16),
+
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    user.name ?? "",
+                    style: const TextStyle(
+                      color: AppColors.colorWhite,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    user.about ?? "",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      color: AppColors.lightText,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

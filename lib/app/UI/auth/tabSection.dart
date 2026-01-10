@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/chat/chatPage.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class TabSection extends StatefulWidget {
@@ -29,12 +30,22 @@ class _TabSectionState extends State<TabSection>
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: AppColors.surface,
           child: TabBar(
             controller: controller,
-            labelColor: Colors.blue,
-            unselectedLabelColor: Colors.black54,
-            indicatorColor: Colors.blue,
+            indicatorColor: AppColors.primary,
+            indicatorWeight: 3,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.lightText,
+            labelStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+
             tabs: const [
               Tab(text: "Chats"),
               Tab(text: "Status"),
@@ -44,13 +55,26 @@ class _TabSectionState extends State<TabSection>
         ),
 
         Expanded(
-          child: TabBarView(
-            controller: controller,
-            children: const [
-              ChatPage(),
-              Center(child: Text("Satus page")),
-              Center(child: Text("Calls page")),
-            ],
+          child: Container(
+            color: AppColors.background,
+            child: TabBarView(
+              controller: controller,
+              children: const [
+                ChatPage(),
+                Center(
+                  child: Text(
+                    "Status page",
+                    style: TextStyle(color: AppColors.lightText),
+                  ),
+                ),
+                Center(
+                  child: Text(
+                    "Calls page",
+                    style: TextStyle(color: AppColors.lightText),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ],

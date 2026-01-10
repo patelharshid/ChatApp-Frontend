@@ -1,5 +1,6 @@
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 
@@ -14,11 +15,12 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController statusController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
+
   final profileUrl =
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaAsJaTD22xdCgfrjTCJzLQmODiZ-tYaXisA&s";
+
   final LoginRepo loginRepo = LoginRepo();
   bool isLoading = false;
-
   String? userId;
 
   @override
@@ -31,23 +33,20 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
     final id = await CommonService.getUserId();
     setState(() {
       userId = id;
-      initProfile();
+      if (userId != null) initProfile();
     });
   }
 
   Future<void> initProfile() async {
     final user = await loginRepo.getUserById(userId!);
-
     nameController.text = user.name ?? '';
     statusController.text = user.about ?? '';
     bioController.text = user.bio ?? '';
-
     setState(() {});
   }
 
   Future<void> addUser() async {
     setState(() => isLoading = true);
-
     try {
       final res = await loginRepo.addUser(
         nameController.text.trim(),
@@ -55,36 +54,49 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
         bioController.text.trim(),
         profileUrl,
       );
+
       CommonService.setUserId(res['data']['userId'].toString());
 
       if (!mounted) return;
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const Homepage()),
       );
-    } catch (e) {
-      print("Failed to create profile");
     } finally {
       setState(() => isLoading = false);
     }
   }
 
+  Widget _fieldContainer({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 14),
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary),
+      ),
+      child: child,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Color(0xFF1976D2),
+        backgroundColor: AppColors.background,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
         centerTitle: true,
+        leading: userId == null
+            ? null
+            : const BackButton(color: AppColors.colorWhite),
         title: Text(
           userId == null ? "Create Profile" : "Update Profile",
           style: const TextStyle(
-            color: Colors.white,
+            color: AppColors.colorWhite,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -97,58 +109,60 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 40),
+
             Center(
-              child: Column(
-                children: [
-                  Container(
-                    height: 120,
-                    width: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey.shade200,
-                      border: Border.all(color: Colors.grey.shade400),
+              child: Container(
+                height: 120,
+                width: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.surface,
+                  border: Border.all(color: AppColors.primary, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
                     ),
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
-                          Icon(Icons.camera_alt, color: Colors.blue, size: 32),
-                          SizedBox(height: 5),
-                          Text(
-                            "Add Photo",
-                            style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                  ],
+                ),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(Icons.camera_alt, color: AppColors.primary, size: 32),
+                    SizedBox(height: 6),
+                    Text(
+                      "Add Photo",
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
 
-            const SizedBox(height: 30),
+            const SizedBox(height: 40),
 
             const Text(
               "Name",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.colorWhite,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 6),
-            TextField(
-              controller: nameController,
-              decoration: InputDecoration(
-                hintText: "Enter your name",
-                filled: true,
-                fillColor: Colors.white,
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14,
-                  horizontal: 14,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
+            _fieldContainer(
+              child: TextField(
+                controller: nameController,
+                style: const TextStyle(color: AppColors.colorWhite),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Enter your name",
+                  hintStyle: TextStyle(color: AppColors.lightText),
                 ),
               ),
             ),
@@ -157,33 +171,28 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
 
             const Text(
               "Status Message",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.colorWhite,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 6),
-
-            Container(
-              padding: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black12),
-                color: Colors.white,
-              ),
+            _fieldContainer(
               child: Row(
                 children: [
                   Expanded(
                     child: TextField(
                       controller: statusController,
+                      style: const TextStyle(color: AppColors.colorWhite),
                       decoration: const InputDecoration(
-                        hintText: "What's on your mind?",
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(
-                          vertical: 14,
-                          horizontal: 14,
-                        ),
+                        hintText: "What's on your mind?",
+                        hintStyle: TextStyle(color: AppColors.lightText),
                       ),
                     ),
                   ),
-                  const Icon(Icons.emoji_emotions, color: Colors.blue),
+                  const Icon(Icons.emoji_emotions, color: AppColors.primary),
                 ],
               ),
             ),
@@ -192,52 +201,61 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
 
             const Text(
               "Bio",
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+              style: TextStyle(
+                color: AppColors.colorWhite,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
             const SizedBox(height: 6),
-
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.black12),
-              ),
-              child: Column(
-                children: [
-                  TextField(
-                    controller: bioController,
-                    maxLines: 3,
-                    maxLength: 120,
-                    decoration: const InputDecoration(
-                      hintText: "Tell us about yourself...",
-                      border: InputBorder.none,
-                    ),
-                  ),
-                ],
+            _fieldContainer(
+              padding: const EdgeInsets.all(14),
+              child: TextField(
+                controller: bioController,
+                maxLines: 3,
+                maxLength: 120,
+                style: const TextStyle(color: AppColors.colorWhite),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "Tell us about yourself...",
+                  hintStyle: TextStyle(color: AppColors.lightText),
+                ),
               ),
             ),
-            const SizedBox(height: 30),
+
+            const SizedBox(height: 40),
 
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: () {
-                  addUser();
-                },
+                onPressed: isLoading ? null : addUser,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF1976D2),
-                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary,
+                  disabledBackgroundColor: AppColors.primary.withValues(
+                    alpha: 0.5,
+                  ),
+                  foregroundColor: AppColors.colorBlack,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
                 ),
-                child: const Text(
-                  "Continue",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.colorBlack,
+                      )
+                    : const Text(
+                        "Continue",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
               ),
             ),
+
+            const SizedBox(height: 30),
           ],
         ),
       ),

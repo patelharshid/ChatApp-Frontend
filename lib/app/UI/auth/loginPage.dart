@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/auth/otpVerificationPage.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        backgroundColor: Colors.red,
+        backgroundColor: AppColors.errorColor,
         duration: const Duration(seconds: 2),
       ),
     );
@@ -76,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Color(0xFF1976D2), Color(0xFF2196F3), Color(0xFF64B5F6)],
+            colors: [AppColors.background, AppColors.mid, AppColors.primary],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -94,11 +95,11 @@ class _LoginPageState extends State<LoginPage> {
                       height: 80,
                       width: 80,
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: const Color(0xFF121212),
                         borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
+                            color: AppColors.primary.withValues(alpha: 0.4),
                             blurRadius: 18,
                             offset: const Offset(0, 8),
                           ),
@@ -106,7 +107,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       child: const Icon(
                         Icons.message,
-                        color: Color(0xFF1976D2),
+                        color: AppColors.primary,
                         size: 45,
                       ),
                     ),
@@ -120,7 +121,7 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: AppColors.colorWhite,
                     ),
                   ),
 
@@ -129,7 +130,7 @@ class _LoginPageState extends State<LoginPage> {
                   const Text(
                     "We'll send you a verification code to confirm your number",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 15),
+                    style: TextStyle(color: Colors.white70, fontSize: 15),
                   ),
 
                   const SizedBox(height: 40),
@@ -140,11 +141,11 @@ class _LoginPageState extends State<LoginPage> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFF121212),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: AppColors.background.withOpacity(0.4),
                           blurRadius: 15,
                           offset: const Offset(0, 6),
                         ),
@@ -157,25 +158,28 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
+                            color: AppColors.colorWhite,
                           ),
                         ),
                         const SizedBox(width: 12),
                         Container(
                           height: 22,
                           width: 1.2,
-                          color: Colors.grey.shade400,
+                          color: AppColors.colorGrey,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
                             controller: phoneController,
                             keyboardType: TextInputType.phone,
-                            cursorColor: Colors.blue,
+                            cursorColor: AppColors.primary,
                             maxLength: 10,
+                            style: const TextStyle(color: AppColors.colorWhite),
                             decoration: const InputDecoration(
                               counterText: "",
                               border: InputBorder.none,
                               hintText: "Phone number",
+                              hintStyle: TextStyle(color: AppColors.colorGrey),
                             ),
                           ),
                         ),
@@ -191,11 +195,11 @@ class _LoginPageState extends State<LoginPage> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: const Color(0xFF121212),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.15),
+                          color: AppColors.colorBlack.withOpacity(0.4),
                           blurRadius: 15,
                           offset: const Offset(0, 6),
                         ),
@@ -204,10 +208,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: TextField(
                       controller: emailController,
                       keyboardType: TextInputType.emailAddress,
-                      cursorColor: Colors.blue,
+                      cursorColor: AppColors.primary,
+                      style: const TextStyle(color: AppColors.colorWhite),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "Email address",
+                        hintStyle: TextStyle(color: AppColors.colorGrey),
                       ),
                     ),
                   ),
@@ -218,10 +224,10 @@ class _LoginPageState extends State<LoginPage> {
                     Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: Text(
-                        error ?? '',
+                        error!,
                         textAlign: TextAlign.center,
                         style: const TextStyle(
-                          color: Colors.red,
+                          color: AppColors.errorColor,
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
@@ -234,9 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: ElevatedButton(
                       onPressed: validateAndSubmit,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
-                        disabledBackgroundColor: Colors.white54,
-                        foregroundColor: const Color(0xFF1976D2),
+                        backgroundColor: AppColors.primary,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
@@ -244,13 +248,14 @@ class _LoginPageState extends State<LoginPage> {
                       child: isLoading
                           ? const CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Color(0xFF1976D2),
+                              color: AppColors.colorBlack,
                             )
                           : const Text(
                               "Send Code",
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
+                                color: AppColors.colorBlack
                               ),
                             ),
                     ),

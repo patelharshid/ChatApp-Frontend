@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/auth/homePage.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,6 @@ class _GroupPageState extends State<GroupPage> {
 
   bool isLoading = true;
   List<UserDetailModel> users = [];
-
   Set<int> selectedIndexes = {};
 
   @override
@@ -39,10 +39,23 @@ class _GroupPageState extends State<GroupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: selectedIndexes.isEmpty
-            ? const Text("Group contact")
-            : Text("${selectedIndexes.length} selected"),
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.colorWhite),
+
+        title: Text(
+          selectedIndexes.isEmpty
+              ? "Add participants"
+              : "${selectedIndexes.length} selected",
+          style: const TextStyle(
+            color: AppColors.colorWhite,
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -55,57 +68,95 @@ class _GroupPageState extends State<GroupPage> {
       ),
 
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
           : ListView.builder(
               itemCount: users.length,
               itemBuilder: (context, index) {
                 final user = users[index];
                 final isSelected = selectedIndexes.contains(index);
 
-                return ListTile(
-                  tileColor: isSelected ? Colors.green.withOpacity(0.12) : null,
-
-                  leading: CircleAvatar(
-                    backgroundImage: user.profileUrl != null
-                        ? NetworkImage(user.profileUrl!)
-                        : null,
-                    child: user.profileUrl == null
-                        ? const Icon(Icons.person)
-                        : null,
+                return Container(
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
                   ),
 
-                  title: Text(
-                    user.name ?? "",
-                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? AppColors.primary.withOpacity(0.15)
+                        : AppColors.surface,
+                    borderRadius: BorderRadius.circular(12),
                   ),
 
-                  subtitle: Text(user.about ?? ""),
+                  child: ListTile(
+                    leading: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 24,
+                          backgroundImage: user.profileUrl != null
+                              ? NetworkImage(user.profileUrl!)
+                              : null,
+                          backgroundColor: AppColors.colorGrey,
+                          child: user.profileUrl == null
+                              ? const Icon(
+                                  Icons.person,
+                                  color: AppColors.colorWhite,
+                                )
+                              : null,
+                        ),
 
-                  trailing: CircleAvatar(
-                    radius: 12,
-                    backgroundColor: isSelected
-                        ? Colors.green
-                        : Colors.grey.shade300,
-                    child: isSelected
-                        ? const Icon(Icons.check, size: 16, color: Colors.white)
-                        : null,
+                        if (isSelected)
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: CircleAvatar(
+                              radius: 10,
+                              backgroundColor: AppColors.primary,
+                              child: const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
+
+                    title: Text(
+                      user.name ?? "",
+                      style: const TextStyle(
+                        color: AppColors.colorWhite,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+
+                    subtitle: Text(
+                      user.about ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(color: AppColors.lightText),
+                    ),
+
+                    onTap: () {
+                      setState(() {
+                        isSelected
+                            ? selectedIndexes.remove(index)
+                            : selectedIndexes.add(index);
+                      });
+                    },
                   ),
-
-                  onTap: () {
-                    setState(() {
-                      if (isSelected) {
-                        selectedIndexes.remove(index);
-                      } else {
-                        selectedIndexes.add(index);
-                      }
-                    });
-                  },
                 );
               },
             ),
 
       floatingActionButton: FloatingActionButton(
-        backgroundColor: selectedIndexes.isEmpty ? Colors.grey : Colors.blue,
+        backgroundColor: selectedIndexes.isEmpty
+            ? AppColors.colorGrey
+            : AppColors.primary,
+        elevation: 3,
+
         onPressed: selectedIndexes.isEmpty
             ? null
             : () {
@@ -114,9 +165,12 @@ class _GroupPageState extends State<GroupPage> {
                   MaterialPageRoute(builder: (_) => const Homepage()),
                 );
               },
+
         child: Icon(
-          Icons.send,
-          color: selectedIndexes.isEmpty ? Colors.black38 : Colors.white,
+          Icons.arrow_forward,
+          color: selectedIndexes.isEmpty
+              ? AppColors.colorBlack12
+              : AppColors.colorWhite,
         ),
       ),
     );

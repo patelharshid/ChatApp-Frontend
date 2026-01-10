@@ -1,8 +1,10 @@
 import 'package:chatapp/Splash_Screen.dart';
+import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/UI/chat/contactPage.dart';
 import 'package:chatapp/app/UI/auth/tabSection.dart';
 import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
+import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
 class Homepage extends StatefulWidget {
@@ -15,73 +17,89 @@ class Homepage extends StatefulWidget {
 class _ChatHomePageState extends State<Homepage> {
   void logout() {
     CommonService.clearSharedPreferences();
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const SplashScreen()),
+      (_) => false,
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
-
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 1,
+        backgroundColor: AppColors.surface,
+        elevation: 0,
+        titleSpacing: 16,
         title: const Text(
           "ChatConnect",
           style: TextStyle(
-            color: Colors.blue,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
+            color: AppColors.primary,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
           ),
         ),
-
         actions: [
+          IconButton(
+            splashRadius: 22,
+            icon: const Icon(
+              Icons.camera_alt_outlined,
+              color: AppColors.colorWhite,
+            ),
+            onPressed: () {},
+          ),
+
           PopupMenuButton<String>(
-            offset: const Offset(0, 50),
+            color: AppColors.surface,
+            splashRadius: 20,
+            icon: const Icon(Icons.more_vert, color: AppColors.colorWhite),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            icon: const Icon(Icons.settings, color: Colors.black87),
             onSelected: (value) {
-              if (value == 'group') {
-                Navigator.push(context, MaterialPageRoute(builder: (context)=> const GroupPage()));
-              } else if (value == 'logout') {
-                logout();
+              switch (value) {
+                case 'group':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const GroupPage()),
+                  );
+                  break;
+
+                case 'profile':
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
+                  );
+                  break;
+
+                case 'logout':
+                  logout();
+                  break;
               }
             },
-            itemBuilder: (context) => const [
+            itemBuilder: (_) => const [
               PopupMenuItem(
                 value: 'group',
-                child: Row(
-                  children: [
-                    Icon(Icons.group_add, color: Colors.black87),
-                    SizedBox(width: 10),
-                    Text("New Group"),
-                  ],
+                child: Text(
+                  "New Group",
+                  style: TextStyle(color: AppColors.colorWhite),
                 ),
               ),
               PopupMenuItem(
                 value: 'profile',
-                child: Row(
-                  children: [
-                    Icon(Icons.person, color: Colors.black87),
-                    SizedBox(width: 10),
-                    Text("Profile"),
-                  ],
+                child: Text(
+                  "Profile",
+                  style: TextStyle(color: AppColors.colorWhite),
                 ),
               ),
               PopupMenuItem(
                 value: 'logout',
-                child: Row(
-                  children: [
-                    Icon(Icons.logout, color: Colors.red),
-                    SizedBox(width: 10),
-                    Text("Logout", style: TextStyle(color: Colors.red)),
-                  ],
+                child: Text(
+                  "Logout",
+                  style: TextStyle(color: AppColors.errorColor),
                 ),
               ),
             ],
@@ -92,16 +110,15 @@ class _ChatHomePageState extends State<Homepage> {
       body: const TabSection(),
 
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
+        elevation: 4,
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (context) => ContactPage()
-            ),
+            MaterialPageRoute(builder: (_) => const ContactPage()),
           );
         },
-        backgroundColor: Colors.blue,
-        child: const Icon(Icons.chat, color: Colors.white),
+        child: const Icon(Icons.chat, color: AppColors.colorBlack),
       ),
     );
   }
