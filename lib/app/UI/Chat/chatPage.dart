@@ -63,7 +63,11 @@ class _ChatPageState extends State<ChatPage> {
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (_) => ChatDetailPage(userName: user.name),
+                builder: (_) => ChatDetailPage(
+                  userId: user.userId,
+                  userName: user.name,
+                  profileUrl: user.profileUrl,
+                ),
               ),
             );
           },
@@ -71,10 +75,7 @@ class _ChatPageState extends State<ChatPage> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: AppColors.colorGrey,
-                  width: 0.3,
-                ),
+                bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
               ),
             ),
             child: Row(

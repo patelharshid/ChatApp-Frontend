@@ -1,9 +1,19 @@
+import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/data/model/message_model.dart';
+import 'package:chatapp/app/data/repository/chat_reop.dart';
 import 'package:flutter/material.dart';
 
 class ChatDetailPage extends StatefulWidget {
+  final int userId;
   final String userName;
+  final String? profileUrl;
 
-  const ChatDetailPage({super.key, required this.userName});
+  const ChatDetailPage({
+    super.key,
+    required this.userId,
+    required this.userName,
+    this.profileUrl,
+  });
 
   @override
   State<ChatDetailPage> createState() => _ChatDetailState();
@@ -12,117 +22,145 @@ class ChatDetailPage extends StatefulWidget {
 class _ChatDetailState extends State<ChatDetailPage> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+
+  final ChatReop _repo = ChatReop();
+
+  List<MessageModel> messages = [];
+  bool isLoading = true;
   bool isTyping = false;
 
   @override
   void initState() {
     super.initState();
+    fetchMessages();
+  }
+
+  Future<void> fetchMessages() async {
+    try {
+      final res = await _repo.getMessageList(widget.userId);
+      setState(() {
+        messages = res;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void sendMessage() {
+    if (_messageController.text.trim().isEmpty) return;
+
+    Future.delayed(const Duration(milliseconds: 100), () {
+      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
+
       appBar: AppBar(
-        title: Row(
-          children: [
-            const CircleAvatar(radius: 20, child: Icon(Icons.person, size: 24)),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(widget.userName, style: const TextStyle(fontSize: 16)),
-                ],
-              ),
-            ),
-          ],
+        backgroundColor: AppColors.surface,
+        iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        title: Text(
+          widget.userName,
+          style: const TextStyle(color: AppColors.colorWhite),
         ),
-        actions: [
-          IconButton(icon: const Icon(Icons.videocam), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.call), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
+        actions: const [
+          Icon(Icons.videocam),
+          SizedBox(width: 12),
+          Icon(Icons.call),
+          SizedBox(width: 12),
+          Icon(Icons.more_vert),
+          SizedBox(width: 8),
         ],
       ),
-      body: SafeArea(
-        child: Container(
-          decoration: BoxDecoration(color: Colors.grey[200]),
-          child: Column(
-            children: [
-              Expanded(
-                child: ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
-                  itemBuilder: (context, index) {
-                    return const SizedBox();
-                  },
+
+      body: isLoading
+          ? const Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.all(12),
+                    itemCount: messages.length,
+                    itemBuilder: (context, index) {
+                      final msg = messages[index];
+                      final bool isMe = msg.sentByMe;
+
+                      return Align(
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
+                          decoration: BoxDecoration(
+                            color: isMe ? AppColors.primary : AppColors.surface,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            msg.content,
+                            style: TextStyle(
+                              color: isMe
+                                  ? AppColors.colorBlack
+                                  : AppColors.colorWhite,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-              _buildMessageInput(),
-            ],
-          ),
-        ),
-      ),
+                _buildMessageInput(),
+              ],
+            ),
     );
   }
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 4,
-            offset: const Offset(0, -1),
-          ),
-        ],
-      ),
+      padding: const EdgeInsets.all(8),
+      color: AppColors.surface,
       child: Row(
         children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: Colors.grey[100],
+                color: AppColors.colorBlack12,
                 borderRadius: BorderRadius.circular(24),
               ),
-              child: Row(
-                children: [
-                  Icon(Icons.emoji_emotions_outlined, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      decoration: const InputDecoration(
-                        hintText: 'Type a message',
-                        border: InputBorder.none,
-                      ),
-                      maxLines: null,
-                      onChanged: (value) {
-                        setState(() {
-                          isTyping = value.trim().isNotEmpty;
-                        });
-                      },
-                    ),
-                  ),
-                  Icon(Icons.attach_file, color: Colors.grey[600]),
-                  const SizedBox(width: 4),
-                  Icon(Icons.camera_alt, color: Colors.grey[600]),
-                ],
+              child: TextField(
+                controller: _messageController,
+                style: const TextStyle(color: AppColors.colorWhite),
+                decoration: const InputDecoration(
+                  hintText: "Type a message",
+                  hintStyle: TextStyle(color: AppColors.lightText),
+                  border: InputBorder.none,
+                ),
+                onChanged: (v) {
+                  setState(() => isTyping = v.trim().isNotEmpty);
+                },
               ),
             ),
           ),
           const SizedBox(width: 8),
           CircleAvatar(
-            backgroundColor: Colors.blue,
+            backgroundColor: AppColors.primary,
             child: IconButton(
               icon: Icon(
                 isTyping ? Icons.send : Icons.mic,
-                color: Colors.white,
+                color: AppColors.colorBlack,
               ),
-              onPressed: () {},
-              padding: EdgeInsets.zero,
+              onPressed: isTyping ? sendMessage : null,
             ),
           ),
         ],

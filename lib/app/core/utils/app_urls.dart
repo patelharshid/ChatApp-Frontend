@@ -11,4 +11,5 @@ class AppUrls {
   static String getAllUser() => "$baseUrl/auth";
 
   static String getChatUsers() => "$baseUrl/chat";
+  static String getMessageList() => "$baseUrl/chat/getMessageList";
 }
