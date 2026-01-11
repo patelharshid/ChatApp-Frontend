@@ -96,6 +96,7 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
       ),
       body: Container(
         width: double.infinity,
+        height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
             colors: [AppColors.background, AppColors.mid, AppColors.primary],

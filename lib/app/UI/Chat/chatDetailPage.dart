@@ -63,10 +63,39 @@ class _ChatDetailState extends State<ChatDetailPage> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         iconTheme: const IconThemeData(color: AppColors.colorWhite),
-        title: Text(
-          widget.userName,
-          style: const TextStyle(color: AppColors.colorWhite),
+        titleSpacing: 0,
+
+        title: Row(
+          children: [
+            const SizedBox(width: 8),
+
+            CircleAvatar(
+              radius: 18,
+              backgroundColor: AppColors.colorGrey,
+              backgroundImage: widget.profileUrl != null
+                  ? NetworkImage(widget.profileUrl!)
+                  : null,
+              child: widget.profileUrl == null
+                  ? const Icon(Icons.person, color: AppColors.colorWhite)
+                  : null,
+            ),
+
+            const SizedBox(width: 10),
+
+            Expanded(
+              child: Text(
+                widget.userName,
+                style: const TextStyle(
+                  color: AppColors.colorWhite,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
         ),
+
         actions: const [
           Icon(Icons.videocam),
           SizedBox(width: 12),
