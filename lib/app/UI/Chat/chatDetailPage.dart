@@ -1,6 +1,8 @@
+import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/message_model.dart';
 import 'package:chatapp/app/data/repository/chat_reop.dart';
+import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:flutter/material.dart';
 
 class ChatDetailPage extends StatefulWidget {
@@ -24,15 +26,41 @@ class _ChatDetailState extends State<ChatDetailPage> {
   final ScrollController _scrollController = ScrollController();
 
   final ChatReop _repo = ChatReop();
+  final SocketService _socketService = SocketService();
 
   List<MessageModel> messages = [];
   bool isLoading = true;
   bool isTyping = false;
+  int? loggedInUserId;
 
   @override
   void initState() {
     super.initState();
+    initUser();
+  }
+
+  Future<void> initUser() async {
+    final id = await CommonService.getUserId();
+    loggedInUserId = int.tryParse(id ?? '');
     fetchMessages();
+    connectSocket();
+  }
+
+  void connectSocket() {
+    if (loggedInUserId == null) return;
+
+    _socketService.connect(loggedInUserId ?? 0);
+
+    _socketService.onMessage((data) {
+      final msg = MessageModel.fromJson({
+        ...data,
+        "sentByMe": data['senderId'] == loggedInUserId,
+      });
+
+      setState(() {
+        messages.add(msg);
+      });
+    });
   }
 
   Future<void> fetchMessages() async {
@@ -48,27 +76,50 @@ class _ChatDetailState extends State<ChatDetailPage> {
   }
 
   void sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
+    if (loggedInUserId == null) return;
 
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+    final text = _messageController.text.trim();
+    if (text.isEmpty) return;
+
+    /// socket payload
+    final socketData = {
+      "senderId": loggedInUserId,
+      "receiverId": widget.userId,
+      "content": text,
+    };
+
+    _socketService.sendMessage(socketData);
+
+    /// local UI message
+    final localMessage = MessageModel.fromJson({
+      "messageId": DateTime.now().millisecondsSinceEpoch.toString(),
+      "content": text,
+      "contentType": "text",
+      "senderId": loggedInUserId,
+      "receiverId": widget.userId,
+      "createdAt": DateTime.now().toIso8601String(),
+      "sentByMe": true,
     });
+
+    setState(() {
+      messages.add(localMessage);
+      isTyping = false;
+    });
+
+    _messageController.clear();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         iconTheme: const IconThemeData(color: AppColors.colorWhite),
         titleSpacing: 0,
-
         title: Row(
           children: [
             const SizedBox(width: 8),
-
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.colorGrey,
@@ -79,9 +130,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
                   ? const Icon(Icons.person, color: AppColors.colorWhite)
                   : null,
             ),
-
             const SizedBox(width: 10),
-
             Expanded(
               child: Text(
                 widget.userName,
@@ -95,7 +144,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
             ),
           ],
         ),
-
         actions: const [
           Icon(Icons.videocam),
           SizedBox(width: 12),
@@ -105,7 +153,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
           SizedBox(width: 8),
         ],
       ),
-
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
