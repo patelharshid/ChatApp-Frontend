@@ -1,3 +1,4 @@
+import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
 import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
@@ -43,9 +44,7 @@ class _ContactPageState extends State<ContactPage> {
         backgroundColor: AppColors.surface,
         elevation: 0,
 
-        iconTheme: const IconThemeData(
-          color: AppColors.colorWhite,
-        ),
+        iconTheme: const IconThemeData(color: AppColors.colorWhite),
 
         title: const Text(
           "Select contact",
@@ -124,7 +123,16 @@ class _ContactPageState extends State<ContactPage> {
   Widget _contactTile(UserDetailModel user) {
     return InkWell(
       onTap: () {
-        debugPrint("Open chat with ${user.name}");
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => ChatDetailPage(
+              userId: user.userId,
+              userName: user.name ?? '',
+              profileUrl: user.profileUrl,
+            ),
+          ),
+        );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
