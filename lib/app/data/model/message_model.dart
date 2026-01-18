@@ -16,16 +16,15 @@ class MessageModel {
     required this.sentByMe,
     required this.createdAt,
   });
-
   factory MessageModel.fromJson(Map<String, dynamic> json) {
     return MessageModel(
-      messageId: json['messageId'],
-      content: json['content'],
-      contentType: json['contentType'],
-      senderId: json['senderId'],
-      receiverId: json['receiverId'],
-      sentByMe: json['sentByMe'],
-      createdAt: json['createdAt'],
+      messageId: json['messageId']?.toString() ?? '',
+      content: json['content'] ?? '',
+      contentType: json['contentType'] ?? 'text',
+      senderId: json['senderId'] ?? 0,
+      receiverId: json['receiverId'] ?? 0,
+      sentByMe: json['sentByMe'] ?? false,
+      createdAt: json['createdAt'] ?? '',
     );
   }
 }

@@ -1,42 +1,43 @@
-import 'dart:convert';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class SocketService {
+  static final SocketService _instance = SocketService._internal();
+  factory SocketService() => _instance;
+  SocketService._internal();
+
   late Socket socket;
+  bool isConnected = false;
 
   void connect(int userId) {
+    if (isConnected) return;
+
     socket = io(
       'http://192.168.157.76:9000',
-      OptionBuilder()
-          .setTransports(['websocket'])
-          .disableAutoConnect()
-          .build(),
+      OptionBuilder().setTransports(['websocket']).disableAutoConnect().build(),
     );
 
     socket.connect();
 
     socket.onConnect((_) {
-      print('Connected to server');
+      isConnected = true;
+      print("Socket connected");
       socket.emit('join', userId);
     });
 
     socket.onDisconnect((_) {
-      print('Disconnected');
+      isConnected = false;
+      print("Socket disconnected");
     });
   }
 
   void sendMessage(Map<String, dynamic> data) {
-    socket.emit('message', jsonEncode(data));
+    socket.emit('message', data);
   }
 
   void onMessage(Function(Map<String, dynamic>) callback) {
+    socket.off('message');
     socket.on('message', (data) {
-      final decoded = jsonDecode(data);
-      callback(Map<String, dynamic>.from(decoded));
+      callback(Map<String, dynamic>.from(data));
     });
-  }
-
-  void disconnect() {
-    socket.disconnect();
   }
 }

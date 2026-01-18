@@ -36,32 +36,45 @@ class _ChatDetailState extends State<ChatDetailPage> {
   @override
   void initState() {
     super.initState();
-    initUser();
+    _init();
   }
 
-  Future<void> initUser() async {
+  Future<void> _init() async {
     final id = await CommonService.getUserId();
     loggedInUserId = int.tryParse(id ?? '');
-    fetchMessages();
+
+    await fetchMessages();
     connectSocket();
   }
 
   void connectSocket() {
-    if (loggedInUserId == null) return;
+  if (loggedInUserId == null) return;
 
-    _socketService.connect(loggedInUserId ?? 0);
+  _socketService.connect(loggedInUserId!);
 
-    _socketService.onMessage((data) {
-      final msg = MessageModel.fromJson({
-        ...data,
-        "sentByMe": data['senderId'] == loggedInUserId,
-      });
+  _socketService.onMessage((data) {
+    if (data['senderId'] == loggedInUserId) return;
 
-      setState(() {
-        messages.add(msg);
-      });
+    final msg = MessageModel.fromJson({
+      "messageId": data["messageId"] ??
+          DateTime.now().millisecondsSinceEpoch.toString(),
+      "content": data["content"] ?? "",
+      "contentType": data["contentType"] ?? "text",
+      "senderId": data["senderId"],
+      "receiverId": data["receiverId"],
+      "createdAt": data["createdAt"] ??
+          DateTime.now().toIso8601String(),
+      "sentByMe": false,
     });
-  }
+
+    setState(() {
+      messages.add(msg);
+    });
+
+    _scrollToBottom();
+  });
+}
+
 
   Future<void> fetchMessages() async {
     try {
@@ -70,10 +83,12 @@ class _ChatDetailState extends State<ChatDetailPage> {
         messages = res;
         isLoading = false;
       });
-    } catch (e) {
+      _scrollToBottom();
+    } catch (_) {
       setState(() => isLoading = false);
     }
   }
+
 
   void sendMessage() {
     if (loggedInUserId == null) return;
@@ -81,7 +96,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
     final text = _messageController.text.trim();
     if (text.isEmpty) return;
 
-    /// socket payload
     final socketData = {
       "senderId": loggedInUserId,
       "receiverId": widget.userId,
@@ -90,7 +104,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
 
     _socketService.sendMessage(socketData);
 
-    /// local UI message
     final localMessage = MessageModel.fromJson({
       "messageId": DateTime.now().millisecondsSinceEpoch.toString(),
       "content": text,
@@ -107,6 +120,27 @@ class _ChatDetailState extends State<ChatDetailPage> {
     });
 
     _messageController.clear();
+    _scrollToBottom();
+  }
+
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -169,9 +203,8 @@ class _ChatDetailState extends State<ChatDetailPage> {
                       final bool isMe = msg.sentByMe;
 
                       return Align(
-                        alignment: isMe
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
+                        alignment:
+                            isMe ? Alignment.centerRight : Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 4),
                           padding: const EdgeInsets.symmetric(
@@ -179,7 +212,8 @@ class _ChatDetailState extends State<ChatDetailPage> {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: isMe ? AppColors.primary : AppColors.surface,
+                            color:
+                                isMe ? AppColors.primary : AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
