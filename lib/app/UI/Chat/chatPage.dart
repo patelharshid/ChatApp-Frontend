@@ -21,17 +21,19 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    fetchChatUsers();
+    fetchChatUsers(); // ✅ only first time
   }
 
   Future<void> fetchChatUsers() async {
     try {
       final res = await _repo.getChatUsers();
+      if (!mounted) return;
       setState(() {
         chatUsers = res;
         isLoading = false;
       });
-    } catch (e) {
+    } catch (_) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
@@ -59,8 +61,9 @@ class _ChatPageState extends State<ChatPage> {
         final user = chatUsers[index];
 
         return InkWell(
-          onTap: () {
-            Navigator.push(
+          onTap: () async {
+            // ✅ WAIT until ChatDetailPage is popped
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (_) => ChatDetailPage(
@@ -70,6 +73,9 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
             );
+
+            // ✅ CALL API ONLY AFTER BACK
+            fetchChatUsers();
           },
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),

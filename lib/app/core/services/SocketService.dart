@@ -12,7 +12,7 @@ class SocketService {
     if (isConnected) return;
 
     socket = io(
-      'http://192.168.157.76:9000',
+      'http://192.168.181.76:9000',
       OptionBuilder().setTransports(['websocket']).disableAutoConnect().build(),
     );
 
