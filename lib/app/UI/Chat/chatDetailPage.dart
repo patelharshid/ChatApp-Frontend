@@ -33,6 +33,9 @@ class _ChatDetailState extends State<ChatDetailPage> {
   bool isTyping = false;
   int? loggedInUserId;
 
+  bool isSelectionMode = false;
+  Set<String> selectedMessageIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -48,33 +51,32 @@ class _ChatDetailState extends State<ChatDetailPage> {
   }
 
   void connectSocket() {
-  if (loggedInUserId == null) return;
+    if (loggedInUserId == null) return;
 
-  _socketService.connect(loggedInUserId!);
+    _socketService.connect(loggedInUserId!);
 
-  _socketService.onMessage((data) {
-    if (data['senderId'] == loggedInUserId) return;
+    _socketService.onMessage((data) {
+      if (data['senderId'] == loggedInUserId) return;
 
-    final msg = MessageModel.fromJson({
-      "messageId": data["messageId"] ??
-          DateTime.now().millisecondsSinceEpoch.toString(),
-      "content": data["content"] ?? "",
-      "contentType": data["contentType"] ?? "text",
-      "senderId": data["senderId"],
-      "receiverId": data["receiverId"],
-      "createdAt": data["createdAt"] ??
-          DateTime.now().toIso8601String(),
-      "sentByMe": false,
+      final msg = MessageModel.fromJson({
+        "messageId":
+            data["messageId"] ??
+            DateTime.now().millisecondsSinceEpoch.toString(),
+        "content": data["content"] ?? "",
+        "contentType": data["contentType"] ?? "text",
+        "senderId": data["senderId"],
+        "receiverId": data["receiverId"],
+        "createdAt": data["createdAt"] ?? DateTime.now().toIso8601String(),
+        "sentByMe": false,
+      });
+
+      setState(() {
+        messages.add(msg);
+      });
+
+      _scrollToBottom();
     });
-
-    setState(() {
-      messages.add(msg);
-    });
-
-    _scrollToBottom();
-  });
-}
-
+  }
 
   Future<void> fetchMessages() async {
     try {
@@ -88,7 +90,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
       setState(() => isLoading = false);
     }
   }
-
 
   void sendMessage() {
     if (loggedInUserId == null) return;
@@ -122,7 +123,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
     _messageController.clear();
     _scrollToBottom();
   }
-
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -203,8 +203,9 @@ class _ChatDetailState extends State<ChatDetailPage> {
                       final bool isMe = msg.sentByMe;
 
                       return Align(
-                        alignment:
-                            isMe ? Alignment.centerRight : Alignment.centerLeft,
+                        alignment: isMe
+                            ? Alignment.centerRight
+                            : Alignment.centerLeft,
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 4),
                           padding: const EdgeInsets.symmetric(
@@ -212,8 +213,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color:
-                                isMe ? AppColors.primary : AppColors.surface,
+                            color: isMe ? AppColors.primary : AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
