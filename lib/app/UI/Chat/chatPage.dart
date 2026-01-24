@@ -21,7 +21,7 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    fetchChatUsers(); // ✅ only first time
+    fetchChatUsers();
   }
 
   Future<void> fetchChatUsers() async {
@@ -62,7 +62,6 @@ class _ChatPageState extends State<ChatPage> {
 
         return InkWell(
           onTap: () async {
-            // ✅ WAIT until ChatDetailPage is popped
             await Navigator.push(
               context,
               MaterialPageRoute(
@@ -73,8 +72,6 @@ class _ChatPageState extends State<ChatPage> {
                 ),
               ),
             );
-
-            // ✅ CALL API ONLY AFTER BACK
             fetchChatUsers();
           },
           child: Container(
