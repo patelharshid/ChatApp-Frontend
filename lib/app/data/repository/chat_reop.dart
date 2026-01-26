@@ -6,17 +6,27 @@ import 'package:chatapp/app/data/model/message_model.dart';
 
 class ChatReop extends BaseRepo {
   Future<List<ChatUserDetailModel>> getChatUsers() async {
-    final res = await DioClient.getInstance().get(AppUrls.getChatUsers());
-    List list = res.data['data'];
-    return list.map((e) => ChatUserDetailModel.fromJson(e)).toList();
+    try {
+      final res = await DioClient.getInstance().get(AppUrls.getChatUsers());
+      List list = res.data['data'];
+      return list.map((e) => ChatUserDetailModel.fromJson(e)).toList();
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<List<MessageModel>> getMessageList(int id) async {
-    final res = await DioClient.getInstance().get(
-      AppUrls.getMessageList(),
-      queryParameters: {"userId": id},
-    );
-    List list = res.data['data'];
-    return list.map((e) => MessageModel.fromJson(e)).toList();
+      try {
+      final res = await DioClient.getInstance().get(
+        AppUrls.getMessageList(),
+        queryParameters: {
+          "userId": id,
+        },
+      );
+      List list = res.data['data'];
+      return list.map((e) => MessageModel.fromJson(e)).toList();
+    } catch (e) {
+      rethrow;
+    }
   }
 }
