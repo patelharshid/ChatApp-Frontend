@@ -1,5 +1,6 @@
 import 'package:chatapp/app/UI/auth/otpVerificationPage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 
@@ -234,31 +235,12 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
 
-                  SizedBox(
-                    width: double.infinity,
-                    height: 55,
-                    child: ElevatedButton(
-                      onPressed: validateAndSubmit,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      child: isLoading
-                          ? const CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: AppColors.colorBlack,
-                            )
-                          : const Text(
-                              "Send Code",
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.colorBlack
-                              ),
-                            ),
-                    ),
+                  ChButton(
+                    title: "Send Code",
+                    isLoading: isLoading,
+                    onPressed: validateAndSubmit,
+                    backgroundColor: AppColors.primary,
+                    textColor: AppColors.colorBlack,
                   ),
                 ],
               ),

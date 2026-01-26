@@ -1,6 +1,7 @@
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 
@@ -225,36 +226,14 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
 
             const SizedBox(height: 40),
 
-            SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : addUser,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  disabledBackgroundColor: AppColors.primary.withValues(
-                    alpha: 0.5,
-                  ),
-                  foregroundColor: AppColors.colorBlack,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                ),
-                child: isLoading
-                    ? const CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: AppColors.colorBlack,
-                      )
-                    : const Text(
-                        "Continue",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-              ),
+            ChButton(
+              title: "Continue",
+              isLoading: isLoading,
+              onPressed: addUser,
+              backgroundColor: AppColors.primary,
+              textColor: AppColors.colorBlack,
+              radius: 14,
             ),
-
             const SizedBox(height: 30),
           ],
         ),

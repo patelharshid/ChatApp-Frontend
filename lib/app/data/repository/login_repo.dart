@@ -42,24 +42,16 @@ class LoginRepo extends BaseRepo {
   }
 
   Future<UserDetailModel> getUserById(String id) async {
-    try {
-      final res = await DioClient.getInstance().get(
-        AppUrls.getUserById(),
-        queryParameters: {"id": id},
-      );
-      return UserDetailModel.fromJson(res.data['data']);
-    } catch (e) {
-      rethrow;
-    }
+    final res = await DioClient.getInstance().get(
+      AppUrls.getUserById(),
+      queryParameters: {"id": id},
+    );
+    return UserDetailModel.fromJson(res.data['data']);
   }
 
   Future<List<UserDetailModel>> getAllUser() async {
-    try {
-      final res = await DioClient.getInstance().get(AppUrls.getAllUser());
-      List list = res.data['data'];
-      return list.map((e) => UserDetailModel.fromJson(e)).toList();
-    } catch (e) {
-      rethrow;
-    }
+    final res = await DioClient.getInstance().get(AppUrls.getAllUser());
+    List list = res.data['data'];
+    return list.map((e) => UserDetailModel.fromJson(e)).toList();
   }
 }
