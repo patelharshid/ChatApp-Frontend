@@ -21,10 +21,10 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    fetchChatUsers();
+    _fetchChatUsers();
   }
 
-  Future<void> fetchChatUsers() async {
+  Future<void> _fetchChatUsers() async {
     try {
       final res = await _repo.getChatUsers();
       if (!mounted) return;
@@ -32,7 +32,7 @@ class _ChatPageState extends State<ChatPage> {
         chatUsers = res;
         isLoading = false;
       });
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
       setState(() => isLoading = false);
     }
@@ -55,100 +55,136 @@ class _ChatPageState extends State<ChatPage> {
       );
     }
 
-    return ListView.builder(
-      itemCount: chatUsers.length,
-      itemBuilder: (context, index) {
-        final user = chatUsers[index];
+    return RefreshIndicator(
+      onRefresh: _fetchChatUsers,
+      color: AppColors.primary,
+      child: ListView.builder(
+        itemCount: chatUsers.length,
+        itemBuilder: (context, index) {
+          final user = chatUsers[index];
+          final bool isGroup = user.chatType == "GROUP";
 
-        return InkWell(
-          onTap: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChatDetailPage(
-                  userId: user.userId,
-                  userName: user.name,
-                  profileUrl: user.profileUrl,
+          return InkWell(
+            onTap: () async {
+              if (isGroup) {
+                // Group chat navigation (enable when ready)
+                /*
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatDetailPage(
+                      groupId: user.groupId!,
+                      isGroup: true,
+                      userName: user.name,
+                      profileUrl: user.profileUrl ?? '',
+                    ),
+                  ),
+                );
+                */
+              } else {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => ChatDetailPage(
+                      userId: user.userId!,
+                      userName: user.name,
+                      profileUrl: user.profileUrl ?? '',
+                    ),
+                  ),
+                );
+              }
+
+              _fetchChatUsers();
+            },
+
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppColors.colorGrey,
+                    width: 0.3,
+                  ),
                 ),
               ),
-            );
-            fetchChatUsers();
-          },
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            decoration: const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
-              ),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 22,
-                  backgroundImage: NetworkImage(user.profileUrl),
-                  backgroundColor: AppColors.colorGrey,
-                ),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 22,
+                    backgroundColor: AppColors.colorGrey,
+                    backgroundImage: user.profileUrl?.isNotEmpty == true
+                        ? NetworkImage(user.profileUrl!)
+                        : null,
+                    child: user.profileUrl == null
+                        ? const Icon(Icons.person, color: Colors.white70)
+                        : null,
+                  ),
 
-                const SizedBox(width: 14),
+                  const SizedBox(width: 14),
 
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.name,
-                        style: const TextStyle(
-                          color: AppColors.colorWhite,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          user.name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            color: AppColors.colorWhite,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 6),
+                        const SizedBox(height: 6),
 
-                      Row(
-                        children: [
-                          if (user.messageType == "SENT")
-                            const Icon(
-                              Icons.done_all,
-                              size: 18,
-                              color: AppColors.primary,
-                            ),
+                        Row(
+                          children: [
+                            if (!isGroup && user.messageType == "SENT")
+                              const Icon(
+                                Icons.done_all,
+                                size: 18,
+                                color: AppColors.primary,
+                              ),
 
-                          if (user.messageType == "SENT")
-                            const SizedBox(width: 4),
+                            if (!isGroup && user.messageType == "SENT")
+                              const SizedBox(width: 4),
 
-                          Expanded(
-                            child: Text(
-                              user.lastMessage,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppColors.lightText,
-                                fontSize: 14,
+                            Expanded(
+                              child: Text(
+                                user.lastMessage ?? '',
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  color: AppColors.lightText,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
 
-                const SizedBox(width: 8),
+                  const SizedBox(width: 8),
 
-                Text(
-                  DateUtil.formatTime(user.lastMessageTime),
-                  style: const TextStyle(
-                    color: AppColors.lightText,
-                    fontSize: 12,
+                  Text(
+                    user.lastMessageTime != null
+                        ? DateUtil.formatTime(user.lastMessageTime!)
+                        : '',
+                    style: const TextStyle(
+                      color: AppColors.lightText,
+                      fontSize: 12,
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }
