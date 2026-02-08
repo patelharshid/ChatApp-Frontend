@@ -1,4 +1,4 @@
-import 'package:chatapp/Splash_Screen.dart';
+import 'package:chatapp/app/UI/auth/loginPage.dart';
 import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/UI/chat/contactPage.dart';
 import 'package:chatapp/app/UI/auth/tabSection.dart';
@@ -19,7 +19,7 @@ class _ChatHomePageState extends State<Homepage> {
     CommonService.clearSharedPreferences();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const SplashScreen()),
+      MaterialPageRoute(builder: (_) => const LoginPage()),
       (_) => false,
     );
   }

@@ -6,6 +6,7 @@ class ChButton extends StatelessWidget {
   final String title;
   final VoidCallback onPressed;
   final bool isLoading;
+  final bool isDisabled;
   final Color backgroundColor;
   final Color textColor;
   final double fontSize;
@@ -17,6 +18,7 @@ class ChButton extends StatelessWidget {
     required this.title,
     required this.onPressed,
     this.isLoading = false,
+    this.isDisabled = false,
     this.backgroundColor = AppColors.primary,
     this.textColor = AppColors.colorWhite,
     this.fontSize = AppValues.fontSize_16,
@@ -26,11 +28,13 @@ class ChButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool disableButton = isDisabled || isLoading;
+
     return SizedBox(
       width: double.infinity,
       height: 55,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+        onPressed: disableButton ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           disabledBackgroundColor: backgroundColor.withOpacity(0.6),
@@ -55,7 +59,7 @@ class ChButton extends StatelessWidget {
                   key: const ValueKey("text"),
                   style: TextStyle(
                     fontSize: fontSize,
-                    color: textColor,
+                    color: disableButton ? Colors.black54 : textColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),

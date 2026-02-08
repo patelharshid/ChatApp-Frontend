@@ -60,6 +60,7 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
   }
 
   String getOtp() => otpControllers.map((c) => c.text).join();
+  bool get isOtpValid => getOtp().length == 6;
 
   Future<void> verifyOtpApi() async {
     final otp = getOtp();
@@ -83,6 +84,30 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
       setState(() => errorMsg = "Invalid OTP. Please try again");
     } finally {
       if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  Future<void> resendOtp() async {
+    if (!enableResend) return;
+
+    try {
+      setState(() {
+        enableResend = false;
+        secondsRemaining = 60;
+      });
+
+      await loginRepo.resendOtp(widget.phone);
+
+      startTimer();
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Failed to resend OTP. Try again."),
+          backgroundColor: AppColors.errorColor,
+        ),
+      );
+      setState(() => enableResend = true);
     }
   }
 
@@ -220,7 +245,8 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
                 ChButton(
                   title: "Verify Code",
                   isLoading: isLoading,
-                  onPressed: getOtp().length == 6 ? verifyOtpApi : () {},
+                  isDisabled: !isOtpValid,
+                  onPressed: verifyOtpApi,
                   backgroundColor: AppColors.primary,
                   textColor: AppColors.colorBlack,
                   radius: 14,
@@ -228,7 +254,7 @@ class _OtpverificationpageState extends State<Otpverificationpage> {
                 const SizedBox(height: 20),
 
                 TextButton(
-                  onPressed: enableResend ? startTimer : null,
+                  onPressed: enableResend ? resendOtp : null,
                   child: Text(
                     enableResend
                         ? "Resend Code"

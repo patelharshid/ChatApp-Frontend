@@ -4,6 +4,7 @@ class AppUrls {
   // AUTH
   static String login() => "$baseUrl/auth/signUp";
   static String otpverification() => "$baseUrl/auth/verify-otp";
+  static String resendOtp() => "$baseUrl/auth/resend_otp";
 
   static String addUser() => "$baseUrl/auth";
   static String getUserById() => "$baseUrl/auth/getUserById";

@@ -22,27 +22,19 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
 
   final LoginRepo loginRepo = LoginRepo();
   bool isLoading = false;
-  String? userId;
+
+  bool get isButtonDisabled =>
+      nameController.text.trim().isEmpty &&
+      statusController.text.trim().isEmpty;
 
   @override
   void initState() {
     super.initState();
-    loadUserId();
+    nameController.addListener(_onTextChanged);
+    statusController.addListener(_onTextChanged);
   }
 
-  Future<void> loadUserId() async {
-    final id = await CommonService.getUserId();
-    setState(() {
-      userId = id;
-      if (userId != null) initProfile();
-    });
-  }
-
-  Future<void> initProfile() async {
-    final user = await loginRepo.getUserById(userId!);
-    nameController.text = user.username ?? '';
-    statusController.text = user.about ?? '';
-    bioController.text = user.bio ?? '';
+  void _onTextChanged() {
     setState(() {});
   }
 
@@ -88,14 +80,12 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        automaticallyImplyLeading: true,
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
-        leading: userId == null
-            ? null
-            : const BackButton(color: AppColors.colorWhite),
         title: Text(
-          userId == null ? "Create Profile" : "Update Profile",
+          "Create Profile",
           style: const TextStyle(
             color: AppColors.colorWhite,
             fontSize: 18,
@@ -230,6 +220,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
               title: "Continue",
               isLoading: isLoading,
               onPressed: addUser,
+              isDisabled: isButtonDisabled,
               backgroundColor: AppColors.primary,
               textColor: AppColors.colorBlack,
               radius: 14,

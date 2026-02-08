@@ -23,6 +23,14 @@ class LoginRepo extends BaseRepo {
     return res.data;
   }
 
+  Future<Map<String, dynamic>> resendOtp(String phoneNumber) async {
+    final res = await DioClient.getInstance().post(
+      AppUrls.resendOtp(),
+      queryParameters: {"phoneNumber": phoneNumber},
+    );
+    return res.data;
+  }
+
   Future<Map<String, dynamic>> addUser(
     String name,
     String about,
