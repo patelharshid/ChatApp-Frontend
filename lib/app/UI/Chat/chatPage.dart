@@ -93,7 +93,6 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 );
               }
-
               _fetchChatUsers();
             },
 
@@ -101,10 +100,7 @@ class _ChatPageState extends State<ChatPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(
-                    color: AppColors.colorGrey,
-                    width: 0.3,
-                  ),
+                  bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
                 ),
               ),
               child: Row(

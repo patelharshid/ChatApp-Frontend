@@ -1,5 +1,4 @@
 import 'package:chatapp/app/core/values/app_colors.dart';
-import 'package:chatapp/app/core/values/app_values.dart';
 import 'package:flutter/material.dart';
 
 class ChButton extends StatelessWidget {
@@ -21,9 +20,9 @@ class ChButton extends StatelessWidget {
     this.isDisabled = false,
     this.backgroundColor = AppColors.primary,
     this.textColor = AppColors.colorWhite,
-    this.fontSize = AppValues.fontSize_16,
+    this.fontSize = 16,
     this.verticalPadding = 14,
-    this.radius = AppValues.radius_20,
+    this.radius = 20,
   });
 
   @override
