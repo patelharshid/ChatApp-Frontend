@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
+import 'package:chatapp/app/UI/group/groupDetailPage.dart';
 import 'package:chatapp/app/core/helper/date_util.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/chat_user_detail_model.dart';
@@ -67,20 +68,18 @@ class _ChatPageState extends State<ChatPage> {
           return InkWell(
             onTap: () async {
               if (isGroup) {
-                // Group chat navigation (enable when ready)
-                /*
+                
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => ChatDetailPage(
+                    builder: (_) => GroupDetailPage(
                       groupId: user.groupId!,
-                      isGroup: true,
                       userName: user.name,
                       profileUrl: user.profileUrl ?? '',
                     ),
                   ),
                 );
-                */
+                
               } else {
                 await Navigator.push(
                   context,
