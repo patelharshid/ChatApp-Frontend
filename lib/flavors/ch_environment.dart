@@ -12,7 +12,7 @@ class ChEnvironment {
     currentEnv = env;
 
     if (env == 'dev') {
-      apiUrl = 'http://192.168.181.76:8081';
+      apiUrl = 'http://192.168.255.76:8081';
     } else if (env == 'uat') {
       apiUrl =
           'https://dentory-api-dev-ckhxaagjfxg3f5fz.centralus-01.azurewebsites.net';

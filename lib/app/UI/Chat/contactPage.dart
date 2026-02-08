@@ -128,7 +128,7 @@ class _ContactPageState extends State<ContactPage> {
           MaterialPageRoute(
             builder: (_) => ChatDetailPage(
               userId: user.userId,
-              userName: user.name ?? '',
+              userName: user.username ?? '',
               profileUrl: user.profileUrl,
             ),
           ),
@@ -161,7 +161,7 @@ class _ContactPageState extends State<ContactPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    user.name ?? "",
+                    user.username ?? "",
                     style: const TextStyle(
                       color: AppColors.colorWhite,
                       fontSize: 16,

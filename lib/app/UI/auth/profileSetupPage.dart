@@ -40,7 +40,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
 
   Future<void> initProfile() async {
     final user = await loginRepo.getUserById(userId!);
-    nameController.text = user.name ?? '';
+    nameController.text = user.username ?? '';
     statusController.text = user.about ?? '';
     bioController.text = user.bio ?? '';
     setState(() {});

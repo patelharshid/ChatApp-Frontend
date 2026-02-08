@@ -244,7 +244,7 @@ class _GroupPageState extends State<GroupPage> {
                       ],
                     ),
                     title: Text(
-                      user.name ?? "",
+                      user.username ?? "",
                       style: const TextStyle(
                         color: AppColors.colorWhite,
                         fontWeight: FontWeight.w600,

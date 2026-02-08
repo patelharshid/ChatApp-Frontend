@@ -3,7 +3,7 @@ class UserDetailModel {
   final String phoneNumber;
   final String email;
   final String? otp;
-  final String? name;
+  final String? username;
   final String? about;
   final String? bio;
   final String? profileUrl;
@@ -16,7 +16,7 @@ class UserDetailModel {
     required this.phoneNumber,
     required this.email,
     this.otp,
-    this.name,
+    this.username,
     this.about,
     this.bio,
     this.profileUrl,
@@ -31,7 +31,7 @@ class UserDetailModel {
       phoneNumber: json['phoneNumber'],
       email: json['email'],
       otp: json['otp'],
-      name: json['name'],
+      username: json['username'],
       about: json['about'],
       bio: json['bio'],
       profileUrl: json['profileUrl'],
