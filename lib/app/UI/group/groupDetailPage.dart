@@ -1,5 +1,6 @@
 import 'package:chatapp/app/core/values/app_colors.dart';
-import 'package:chatapp/app/data/model/message_model.dart';
+import 'package:chatapp/app/data/model/group_message_model.dart';
+import 'package:chatapp/app/data/repository/group_repo.dart';
 import 'package:flutter/material.dart';
 
 class GroupDetailPage extends StatefulWidget {
@@ -21,11 +22,41 @@ class GroupDetailPage extends StatefulWidget {
 class _GroupDetailPageState extends State<GroupDetailPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
+  final GroupRepo _groupRepo = GroupRepo();
 
   bool isLoading = true;
   bool isTyping = false;
 
-  List<MessageModel> messages = [];
+  List<GroupMessageModel> messages = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchMessages();
+  }
+
+  Future<void> _fetchMessages() async {
+    try {
+      final data = await _groupRepo.groupMessage(widget.groupId);
+
+      setState(() {
+        messages = data;
+        isLoading = false;
+      });
+
+      _scrollToBottom();
+    } catch (e) {
+      setState(() => isLoading = false);
+    }
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,10 +72,11 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.colorGrey,
-              backgroundImage: widget.profileUrl != null
+              backgroundImage:
+                  widget.profileUrl != null && widget.profileUrl!.isNotEmpty
                   ? NetworkImage(widget.profileUrl!)
                   : null,
-              child: widget.profileUrl == null
+              child: widget.profileUrl == null || widget.profileUrl!.isEmpty
                   ? const Icon(Icons.person, color: AppColors.colorWhite)
                   : null,
             ),
@@ -62,23 +94,26 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
             ),
           ],
         ),
-        actions: const [
-          Icon(Icons.videocam),
-          SizedBox(width: 12),
-          Icon(Icons.call),
-          SizedBox(width: 12),
-          Icon(Icons.more_vert),
-          SizedBox(width: 8),
-        ],
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: AppColors.primary),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
+
+      body: Column(
+        children: [
+          Expanded(
+            child: isLoading
+                ? const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  )
+                : messages.isEmpty
+                ? const Center(
+                    child: Text(
+                      "No chat yet",
+                      style: TextStyle(
+                        color: AppColors.lightText,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(12),
                     itemCount: messages.length,
@@ -100,22 +135,40 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                             color: isMe ? AppColors.primary : AppColors.surface,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: Text(
-                            msg.content,
-                            style: TextStyle(
-                              color: isMe
-                                  ? AppColors.colorBlack
-                                  : AppColors.colorWhite,
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (!isMe)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 4),
+                                  child: Text(
+                                    msg.senderName,
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              Text(
+                                msg.content,
+                                style: TextStyle(
+                                  color: isMe
+                                      ? AppColors.colorBlack
+                                      : AppColors.colorWhite,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
                     },
                   ),
-                ),
-                _buildMessageInput(),
-              ],
-            ),
+          ),
+
+          _buildMessageInput(),
+        ],
+      ),
     );
   }
 
@@ -154,7 +207,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                 isTyping ? Icons.send : Icons.mic,
                 color: AppColors.colorBlack,
               ),
-              onPressed: isTyping ? null : null,
+              onPressed: isTyping ? () {} : null,
             ),
           ),
         ],

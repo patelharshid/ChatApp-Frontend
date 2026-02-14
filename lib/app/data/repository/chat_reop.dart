@@ -9,7 +9,6 @@ class ChatReop extends BaseRepo {
     try {
       final res = await DioClient.getInstance().get(AppUrls.getChatUsers());
       List list = res.data['data'];
-      print("hello${list}");
       return list.map((e) => ChatUserDetailModel.fromJson(e)).toList();
     } catch (e) {
       rethrow;
