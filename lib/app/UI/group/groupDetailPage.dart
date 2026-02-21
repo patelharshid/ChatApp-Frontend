@@ -1,3 +1,4 @@
+import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/group_message_model.dart';
 import 'package:chatapp/app/data/repository/group_repo.dart';
@@ -26,6 +27,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
 
   bool isLoading = true;
   bool isTyping = false;
+  int? loggedInUserId;
 
   List<GroupMessageModel> messages = [];
 
@@ -33,6 +35,12 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   void initState() {
     super.initState();
     _fetchMessages();
+    _init();
+  }
+
+  Future<void> _init() async {
+    final id = await CommonService.getUserId();
+    loggedInUserId = int.tryParse(id ?? '');
   }
 
   Future<void> _fetchMessages() async {

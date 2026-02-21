@@ -40,4 +40,20 @@ class SocketService {
       callback(Map<String, dynamic>.from(data));
     });
   }
+
+  void joinGroup(int groupId) {
+    if (!isConnected) return;
+    socket.emit('join-group', groupId);
+  }
+
+  void sendGroupMessage(Map<String, dynamic> data) {
+    socket.emit('group-message', data);
+  }
+
+  void onGroupMessage(Function(Map<String, dynamic>) callback) {
+    socket.off('group-message');
+    socket.on('group-message', (data) {
+      callback(Map<String, dynamic>.from(data));
+    });
+  }
 }
