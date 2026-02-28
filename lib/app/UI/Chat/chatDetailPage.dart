@@ -53,8 +53,8 @@ class _ChatDetailState extends State<ChatDetailPage> {
   void connectSocket() {
     if (loggedInUserId == null) return;
 
-    _socketService.connect(loggedInUserId!);
-
+    _socketService.connectUser(loggedInUserId!);
+    
     _socketService.onMessage((data) {
       if (data['senderId'] == loggedInUserId) return;
 
@@ -150,6 +150,13 @@ class _ChatDetailState extends State<ChatDetailPage> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            _socketService.disconnect();
+            Navigator.pop(context);
+          },
+        ),
         titleSpacing: 0,
         title: Row(
           children: [

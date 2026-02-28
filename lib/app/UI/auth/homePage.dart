@@ -24,6 +24,10 @@ class _ChatHomePageState extends State<Homepage> {
     );
   }
 
+  void _refreshHome() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,11 +116,14 @@ class _ChatHomePageState extends State<Homepage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         elevation: 4,
-        onPressed: () {
-          Navigator.push(
+        onPressed: () async {
+          final result = await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const ContactPage()),
           );
+          if (result == true) {
+            _refreshHome();
+          }
         },
         child: const Icon(Icons.chat, color: AppColors.colorBlack),
       ),

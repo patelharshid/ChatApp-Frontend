@@ -43,7 +43,12 @@ class _ContactPageState extends State<ContactPage> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: AppColors.colorWhite),
+          onPressed: () {
+            Navigator.pop(context, true);
+          },
+        ),
         iconTheme: const IconThemeData(color: AppColors.colorWhite),
 
         title: const Text(

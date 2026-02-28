@@ -1,3 +1,4 @@
+import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/group_message_model.dart';
@@ -24,6 +25,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _messageController = TextEditingController();
   final GroupRepo _groupRepo = GroupRepo();
+  final SocketService _socketService = SocketService();
 
   bool isLoading = true;
   bool isTyping = false;
@@ -34,13 +36,34 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   @override
   void initState() {
     super.initState();
-    _fetchMessages();
     _init();
   }
 
   Future<void> _init() async {
     final id = await CommonService.getUserId();
     loggedInUserId = int.tryParse(id ?? '');
+
+    await _fetchMessages();
+
+    if (loggedInUserId != null) {
+      _socketService.connectGroup(loggedInUserId!, widget.groupId);
+      _listenMessages();
+    }
+  }
+
+  void _listenMessages() {
+    _socketService.onGroupMessage((data) {
+      final msg = GroupMessageModel.fromJson(data);
+      if (msg.senderId == loggedInUserId) {
+        return;
+      }
+
+      setState(() {
+        messages.add(msg);
+      });
+
+      _scrollToBottom();
+    });
   }
 
   Future<void> _fetchMessages() async {
@@ -58,6 +81,33 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
     }
   }
 
+  void _sendMessage() {
+    final text = _messageController.text.trim();
+    if (text.isEmpty || loggedInUserId == null) return;
+
+    final messageData = {
+      "groupId": widget.groupId,
+      "senderId": loggedInUserId,
+      "senderName": "You",
+      "content": text,
+      "contentType": "TEXT",
+      "createdAt": DateTime.now().toIso8601String(),
+    };
+
+    _socketService.sendGroupMessage(messageData);
+
+    final localMsg = GroupMessageModel.fromJson(messageData);
+
+    setState(() {
+      messages.add(localMsg);
+    });
+
+    _messageController.clear();
+    setState(() => isTyping = false);
+
+    _scrollToBottom();
+  }
+
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
@@ -67,12 +117,26 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   }
 
   @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            _socketService.disconnect();
+            Navigator.pop(context);
+          },
+        ),
         titleSpacing: 0,
         title: Row(
           children: [
@@ -127,7 +191,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
-                      final bool isMe = msg.sentByMe;
+                      final bool isMe = msg.senderId == loggedInUserId;
 
                       return Align(
                         alignment: isMe
@@ -183,14 +247,14 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
   Widget _buildMessageInput() {
     return Container(
       padding: const EdgeInsets.all(8),
-      color: AppColors.surface,
+      color: const Color.fromARGB(255, 45, 45, 45),
       child: Row(
         children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.colorBlack12,
+                color: Colors.black45,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: TextField(
@@ -215,7 +279,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
                 isTyping ? Icons.send : Icons.mic,
                 color: AppColors.colorBlack,
               ),
-              onPressed: isTyping ? () {} : null,
+              onPressed: isTyping ? _sendMessage : null,
             ),
           ),
         ],

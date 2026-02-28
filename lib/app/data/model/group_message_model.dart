@@ -1,5 +1,5 @@
 class GroupMessageModel {
-  final int groupMessagesId;
+  final String groupMessagesId;
   final int senderId;
   final String senderName;
   final String content;
@@ -21,7 +21,7 @@ class GroupMessageModel {
 
   factory GroupMessageModel.fromJson(Map<String, dynamic> json) {
     return GroupMessageModel(
-      groupMessagesId: json['groupMessagesId'],
+      groupMessagesId: json['groupMessagesId']?.toString() ?? '',
       senderId: json['senderId'],
       senderName: json['senderName'] ?? '',
       content: json['content'] ?? '',
