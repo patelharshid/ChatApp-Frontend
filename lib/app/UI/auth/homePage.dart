@@ -33,15 +33,26 @@ class _ChatHomePageState extends State<Homepage> {
       appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: AppColors.surface,
+        elevation: 0,
+        titleSpacing: 16,
         title: const Text(
           "ChatConnect",
           style: TextStyle(
             color: AppColors.primary,
             fontSize: 20,
             fontWeight: FontWeight.w600,
+            letterSpacing: 0.3,
           ),
         ),
         actions: [
+          IconButton(
+            splashRadius: 22,
+            icon: const Icon(
+              Icons.camera_alt_outlined,
+              color: AppColors.colorWhite,
+            ),
+            onPressed: () {},
+          ),
           PopupMenuButton<String>(
             color: AppColors.surface,
             onSelected: (value) {
@@ -101,7 +112,6 @@ class _ChatHomePageState extends State<Homepage> {
           );
 
           if (result == true) {
-            // 🔥 Refresh ChatPage
             tabKey.currentState?.refreshChats();
           }
         },
