@@ -6,17 +6,23 @@ class TabSection extends StatefulWidget {
   const TabSection({super.key});
 
   @override
-  State<TabSection> createState() => _TabSectionState();
+  TabSectionState createState() => TabSectionState();
 }
 
-class _TabSectionState extends State<TabSection>
+class TabSectionState extends State<TabSection>
     with SingleTickerProviderStateMixin {
   late TabController controller;
+
+  final GlobalKey<ChatPageState> chatPageKey = GlobalKey<ChatPageState>();
 
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
+  }
+
+  void refreshChats() {
+    chatPageKey.currentState?.fetchChatUsers();
   }
 
   @override
@@ -53,21 +59,20 @@ class _TabSectionState extends State<TabSection>
             ],
           ),
         ),
-
         Expanded(
           child: Container(
             color: AppColors.background,
             child: TabBarView(
               controller: controller,
-              children: const [
-                ChatPage(),
-                Center(
+              children: [
+                ChatPage(key: chatPageKey),
+                const Center(
                   child: Text(
                     "Status page",
                     style: TextStyle(color: AppColors.lightText),
                   ),
                 ),
-                Center(
+                const Center(
                   child: Text(
                     "Calls page",
                     style: TextStyle(color: AppColors.lightText),

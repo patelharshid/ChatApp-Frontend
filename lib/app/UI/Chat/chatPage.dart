@@ -10,10 +10,10 @@ class ChatPage extends StatefulWidget {
   const ChatPage({super.key});
 
   @override
-  State<ChatPage> createState() => _ChatPageState();
+  ChatPageState createState() => ChatPageState();
 }
 
-class _ChatPageState extends State<ChatPage> {
+class ChatPageState extends State<ChatPage> {
   final ChatReop _repo = ChatReop();
 
   List<ChatUserDetailModel> chatUsers = [];
@@ -22,10 +22,10 @@ class _ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    _fetchChatUsers();
+    fetchChatUsers();
   }
 
-  Future<void> _fetchChatUsers() async {
+  Future<void> fetchChatUsers() async {
     try {
       final res = await _repo.getChatUsers();
       if (!mounted) return;
@@ -57,7 +57,7 @@ class _ChatPageState extends State<ChatPage> {
     }
 
     return RefreshIndicator(
-      onRefresh: _fetchChatUsers,
+      onRefresh: fetchChatUsers,
       color: AppColors.primary,
       child: ListView.builder(
         itemCount: chatUsers.length,
@@ -92,7 +92,7 @@ class _ChatPageState extends State<ChatPage> {
                   ),
                 );
               }
-              _fetchChatUsers();
+              fetchChatUsers();
             },
 
             child: Container(
