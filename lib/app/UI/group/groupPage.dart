@@ -2,10 +2,12 @@ import 'dart:io';
 
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/group_repo.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class GroupPage extends StatefulWidget {
   const GroupPage({super.key});
@@ -17,7 +19,12 @@ class GroupPage extends StatefulWidget {
 class _GroupPageState extends State<GroupPage> {
   final LoginRepo _repo = LoginRepo();
   final GroupRepo _groupRepo = GroupRepo();
+
   final TextEditingController _groupNameController = TextEditingController();
+
+  final ImagePicker _picker = ImagePicker();
+
+  File? selectedImage;
 
   bool isLoading = true;
   bool isSaving = false;
@@ -35,6 +42,7 @@ class _GroupPageState extends State<GroupPage> {
   Future<void> fetchUsers() async {
     try {
       final res = await _repo.getAllUser();
+
       setState(() {
         users = res;
         isLoading = false;
@@ -55,8 +63,13 @@ class _GroupPageState extends State<GroupPage> {
         errorMessage = null;
       });
 
+      String groupImage = selectedImage != null
+          ? selectedImage!.path
+          : "https://cdn-icons-png.flaticon.com/512/681/681494.png";
+
       await _groupRepo.createGroup(
         _groupNameController.text.trim(),
+        groupImage,
         getSelectedUserIds(),
       );
 
@@ -68,102 +81,180 @@ class _GroupPageState extends State<GroupPage> {
       );
     } catch (e) {
       setState(() {
-        errorMessage =
-            e.toString().replaceAll('Exception:', '').trim();
+        errorMessage = e.toString();
       });
     } finally {
       setState(() => isSaving = false);
     }
   }
 
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
+    }
+  }
+
   void _showCreateGroupDialog() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
-      barrierDismissible: false,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       builder: (_) {
-        return AlertDialog(
-          backgroundColor: AppColors.surface,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            "Create Group",
-            style: TextStyle(
-              color: AppColors.colorWhite,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                controller: _groupNameController,
-                style: const TextStyle(color: AppColors.colorWhite),
-                decoration: const InputDecoration(
-                  hintText: "Enter group name",
-                  hintStyle: TextStyle(color: AppColors.lightText),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.lightText),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: AppColors.primary),
-                  ),
-                ),
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Container(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
               ),
-              if (errorMessage != null) ...[
-                const SizedBox(height: 8),
-                Text(
-                  errorMessage!,
-                  style: const TextStyle(
-                    color: Colors.redAccent,
-                    fontSize: 13,
-                  ),
-                ),
-              ],
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: isSaving
-                  ? null
-                  : () {
-                      _groupNameController.clear();
-                      errorMessage = null;
-                      Navigator.pop(context);
-                    },
-              child: const Text(
-                "Cancel",
-                style: TextStyle(color: AppColors.lightText),
+              decoration: const BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
               ),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-              ),
-              onPressed: isSaving
-                  ? null
-                  : () async {
-                      if (_groupNameController.text.trim().isEmpty) {
-                        setState(() {
-                          errorMessage = "Group name is required";
-                        });
-                        return;
-                      }
-                      await _createGroup();
-                    },
-              child: isSaving
-                  ? const SizedBox(
-                      height: 18,
-                      width: 18,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      height: 5,
+                      width: 50,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade600,
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                    )
-                  : const Text("Save"),
-            ),
-          ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    const Text(
+                      "Create New Group",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.colorWhite,
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+
+                    GestureDetector(
+                      onTap: () async {
+                        final XFile? image = await _picker.pickImage(
+                          source: ImageSource.gallery,
+                        );
+
+                        if (image != null) {
+                          setModalState(() {
+                            selectedImage = File(image.path);
+                          });
+                        }
+                      },
+                      child: Stack(
+                        alignment: Alignment.bottomRight,
+                        children: [
+                          CircleAvatar(
+                            radius: 45,
+                            backgroundColor: AppColors.primary.withOpacity(0.2),
+                            backgroundImage: selectedImage != null
+                                ? FileImage(selectedImage!)
+                                : null,
+                            child: selectedImage == null
+                                ? const Icon(
+                                    Icons.groups,
+                                    size: 40,
+                                    color: AppColors.primary,
+                                  )
+                                : null,
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.camera_alt,
+                              size: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 25),
+                    _fieldContainer(
+                      child: TextField(
+                        controller: _groupNameController,
+                        style: const TextStyle(color: AppColors.colorWhite),
+                        decoration: const InputDecoration(
+                          border: InputBorder.none,
+                          hintText: "Enter group name",
+                          hintStyle: TextStyle(color: AppColors.lightText),
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 15),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.people, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${selectedIndexes.length} members selected",
+                          style: const TextStyle(
+                            color: AppColors.lightText,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    if (errorMessage != null) ...[
+                      const SizedBox(height: 10),
+                      Text(
+                        errorMessage!,
+                        style: const TextStyle(
+                          color: Colors.redAccent,
+                          fontSize: 13,
+                        ),
+                      ),
+                    ],
+
+                    const SizedBox(height: 25),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ChButton(
+                        title: "Create Group",
+                        isLoading: isSaving,
+                        onPressed: () async {
+                          if (_groupNameController.text.trim().isEmpty) {
+                            setModalState(() {
+                              errorMessage = "Group name required";
+                            });
+                            return;
+                          }
+
+                          await _createGroup();
+                        },
+                        backgroundColor: AppColors.primary,
+                        textColor: AppColors.colorBlack,
+                        radius: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -186,15 +277,6 @@ class _GroupPageState extends State<GroupPage> {
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const Homepage()),
-            );
-          },
         ),
       ),
       body: isLoading
@@ -225,14 +307,16 @@ class _GroupPageState extends State<GroupPage> {
                           radius: 24,
                           backgroundImage: user.profileUrl != null
                               ? (user.profileUrl!.startsWith("http")
-                                  ? NetworkImage(user.profileUrl!)
-                                  : FileImage(File(user.profileUrl!)))
-                              as ImageProvider
+                                        ? NetworkImage(user.profileUrl!)
+                                        : FileImage(File(user.profileUrl!)))
+                                    as ImageProvider
                               : null,
                           backgroundColor: AppColors.colorGrey,
                           child: user.profileUrl == null
-                              ? const Icon(Icons.person,
-                                  color: AppColors.colorWhite)
+                              ? const Icon(
+                                  Icons.person,
+                                  color: AppColors.colorWhite,
+                                )
                               : null,
                         ),
                         if (isSelected)
@@ -242,8 +326,11 @@ class _GroupPageState extends State<GroupPage> {
                             child: CircleAvatar(
                               radius: 10,
                               backgroundColor: AppColors.primary,
-                              child: const Icon(Icons.check,
-                                  size: 14, color: Colors.white),
+                              child: const Icon(
+                                Icons.check,
+                                size: 14,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                       ],
@@ -259,8 +346,7 @@ class _GroupPageState extends State<GroupPage> {
                       user.about ?? "",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style:
-                          const TextStyle(color: AppColors.lightText),
+                      style: const TextStyle(color: AppColors.lightText),
                     ),
                     onTap: () {
                       setState(() {
@@ -277,16 +363,24 @@ class _GroupPageState extends State<GroupPage> {
         backgroundColor: selectedIndexes.isEmpty
             ? AppColors.colorGrey
             : AppColors.primary,
-        elevation: 3,
-        onPressed:
-            selectedIndexes.isEmpty ? null : _showCreateGroupDialog,
-        child: Icon(
-          Icons.arrow_forward,
-          color: selectedIndexes.isEmpty
-              ? AppColors.colorBlack12
-              : AppColors.colorWhite,
-        ),
+        onPressed: selectedIndexes.isEmpty ? null : _showCreateGroupDialog,
+        child: const Icon(Icons.arrow_forward),
       ),
+    );
+  }
+
+  Widget _fieldContainer({
+    required Widget child,
+    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 14),
+  }) {
+    return Container(
+      padding: padding,
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary),
+      ),
+      child: child,
     );
   }
 }

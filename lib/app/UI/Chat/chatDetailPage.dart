@@ -250,14 +250,14 @@ class _ChatDetailState extends State<ChatDetailPage> {
   Widget _buildMessageInput() {
     return Container(
       padding: const EdgeInsets.all(8),
-      color: AppColors.surface,
+      color: const Color.fromARGB(255, 45, 45, 45),
       child: Row(
         children: [
           Expanded(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
-                color: AppColors.colorBlack12,
+                color: Colors.black45,
                 borderRadius: BorderRadius.circular(24),
               ),
               child: TextField(
