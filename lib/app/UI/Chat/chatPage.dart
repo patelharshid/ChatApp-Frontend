@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
 import 'package:chatapp/app/UI/group/groupDetailPage.dart';
 import 'package:chatapp/app/core/helper/date_util.dart';
@@ -68,7 +70,6 @@ class ChatPageState extends State<ChatPage> {
           return InkWell(
             onTap: () async {
               if (isGroup) {
-                
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -79,7 +80,6 @@ class ChatPageState extends State<ChatPage> {
                     ),
                   ),
                 );
-                
               } else {
                 await Navigator.push(
                   context,
@@ -107,8 +107,12 @@ class ChatPageState extends State<ChatPage> {
                   CircleAvatar(
                     radius: 22,
                     backgroundColor: AppColors.colorGrey,
-                    backgroundImage: user.profileUrl?.isNotEmpty == true
-                        ? NetworkImage(user.profileUrl!)
+                    backgroundImage:
+                        user.profileUrl != null && user.profileUrl!.isNotEmpty
+                        ? (user.profileUrl!.startsWith("http")
+                                  ? NetworkImage(user.profileUrl!)
+                                  : FileImage(File(user.profileUrl!)))
+                              as ImageProvider
                         : null,
                     child: user.profileUrl == null
                         ? const Icon(Icons.person, color: Colors.white70)

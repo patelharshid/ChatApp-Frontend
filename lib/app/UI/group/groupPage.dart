@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
@@ -222,7 +224,10 @@ class _GroupPageState extends State<GroupPage> {
                         CircleAvatar(
                           radius: 24,
                           backgroundImage: user.profileUrl != null
-                              ? NetworkImage(user.profileUrl!)
+                              ? (user.profileUrl!.startsWith("http")
+                                  ? NetworkImage(user.profileUrl!)
+                                  : FileImage(File(user.profileUrl!)))
+                              as ImageProvider
                               : null,
                           backgroundColor: AppColors.colorGrey,
                           child: user.profileUrl == null

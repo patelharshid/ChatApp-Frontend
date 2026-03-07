@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class ProfileSetupPage extends StatefulWidget {
   const ProfileSetupPage({super.key});
@@ -16,6 +19,9 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController statusController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
+
+  File? selectedImage;
+  final ImagePicker _picker = ImagePicker();
 
   final profileUrl =
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaAsJaTD22xdCgfrjTCJzLQmODiZ-tYaXisA&s";
@@ -38,6 +44,16 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
     setState(() {});
   }
 
+  Future<void> pickImage() async {
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        selectedImage = File(image.path);
+      });
+    }
+  }
+
   Future<void> addUser() async {
     setState(() => isLoading = true);
     try {
@@ -45,7 +61,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
         nameController.text.trim(),
         statusController.text.trim(),
         bioController.text.trim(),
-        profileUrl,
+        selectedImage?.path ?? profileUrl,
       );
 
       CommonService.setUserId(res['data']['userId'].toString());
@@ -102,35 +118,46 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
             const SizedBox(height: 40),
 
             Center(
-              child: Container(
-                height: 120,
-                width: 120,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: AppColors.surface,
-                  border: Border.all(color: AppColors.primary, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.primary.withValues(alpha: 0.4),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.camera_alt, color: AppColors.primary, size: 32),
-                    SizedBox(height: 6),
-                    Text(
-                      "Add Photo",
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
+              child: GestureDetector(
+                onTap: pickImage,
+                child: Container(
+                  height: 120,
+                  width: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: AppColors.surface,
+                    border: Border.all(color: AppColors.primary, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.4),
+                        blurRadius: 15,
+                        offset: const Offset(0, 8),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: selectedImage != null
+                      ? ClipOval(
+                          child: Image.file(selectedImage!, fit: BoxFit.cover),
+                        )
+                      : const Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.camera_alt,
+                              color: AppColors.primary,
+                              size: 32,
+                            ),
+                            SizedBox(height: 6),
+                            Text(
+                              "Add Photo",
+                              style: TextStyle(
+                                color: AppColors.primary,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
                 ),
               ),
             ),

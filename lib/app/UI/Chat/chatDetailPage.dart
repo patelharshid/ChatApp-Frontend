@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/data/model/message_model.dart';
@@ -45,7 +47,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
   Future<void> _init() async {
     final id = await CommonService.getUserId();
     loggedInUserId = int.tryParse(id ?? '');
-
     await fetchMessages();
     connectSocket();
   }
@@ -54,7 +55,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
     if (loggedInUserId == null) return;
 
     _socketService.connectUser(loggedInUserId!);
-    
+
     _socketService.onMessage((data) {
       if (data['senderId'] == loggedInUserId) return;
 
@@ -164,10 +165,14 @@ class _ChatDetailState extends State<ChatDetailPage> {
             CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.colorGrey,
-              backgroundImage: widget.profileUrl != null
-                  ? NetworkImage(widget.profileUrl!)
+              backgroundImage:
+                  widget.profileUrl != null && widget.profileUrl!.isNotEmpty
+                  ? (widget.profileUrl!.startsWith("http")
+                            ? NetworkImage(widget.profileUrl!)
+                            : FileImage(File(widget.profileUrl!)))
+                        as ImageProvider
                   : null,
-              child: widget.profileUrl == null
+              child: widget.profileUrl == null || widget.profileUrl!.isEmpty
                   ? const Icon(Icons.person, color: AppColors.colorWhite)
                   : null,
             ),

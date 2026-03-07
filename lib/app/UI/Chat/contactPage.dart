@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
 import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
@@ -152,7 +154,10 @@ class _ContactPageState extends State<ContactPage> {
               radius: 24,
               backgroundColor: AppColors.colorGrey,
               backgroundImage: user.profileUrl != null
-                  ? NetworkImage(user.profileUrl!)
+                  ? (user.profileUrl!.startsWith("http")
+                            ? NetworkImage(user.profileUrl!)
+                            : FileImage(File(user.profileUrl!)))
+                        as ImageProvider
                   : null,
               child: user.profileUrl == null
                   ? const Icon(Icons.person, color: AppColors.lightText)
