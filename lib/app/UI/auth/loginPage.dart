@@ -15,28 +15,10 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
+  final LoginRepo loginRepo = LoginRepo();
 
   bool isLoading = false;
   String? error;
-
-  final LoginRepo loginRepo = LoginRepo();
-
-  @override
-  void initState() {
-    super.initState();
-
-    phoneController.addListener(_onTextChange);
-    emailController.addListener(_onTextChange);
-  }
-
-  void _onTextChange() {
-    setState(() {});
-  }
-
-  bool get isFormValid {
-    return phoneController.text.trim().isNotEmpty &&
-        emailController.text.trim().isNotEmpty;
-  }
 
   Future<void> validateAndSubmit() async {
     setState(() {
@@ -66,33 +48,14 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (_) => Otpverificationpage(phone: phone)),
       );
     } catch (_) {
-      showError("Failed to send OTP. Please try again");
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
   }
 
-  void showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.errorColor,
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    phoneController.dispose();
-    emailController.dispose();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: true,
       body: Container(
         width: double.infinity,
         height: double.infinity,
@@ -110,7 +73,6 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 100),
-
                 Center(
                   child: Container(
                     height: 80,
@@ -198,7 +160,6 @@ class _LoginPageState extends State<LoginPage> {
                 ChButton(
                   title: "Send Code",
                   isLoading: isLoading,
-                  isDisabled: !isFormValid,
                   onPressed: validateAndSubmit,
                   textColor: AppColors.colorBlack,
                 ),
