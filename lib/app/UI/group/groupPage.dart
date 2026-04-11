@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chatapp/app/UI/auth/homePage.dart';
+import 'package:chatapp/app/UI/auth/home_screen.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
@@ -77,7 +77,7 @@ class _GroupPageState extends State<GroupPage> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const Homepage()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } catch (e) {
       setState(() {

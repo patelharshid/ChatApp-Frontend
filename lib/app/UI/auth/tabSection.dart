@@ -16,10 +16,16 @@ class TabSectionState extends State<TabSection>
 
   final GlobalKey<ChatPageState> chatPageKey = GlobalKey<ChatPageState>();
 
+  int get currentIndex => controller.index;
+
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
+
+    controller.addListener(() {
+      setState(() {});
+    });
   }
 
   void refreshChats() {
@@ -44,15 +50,6 @@ class TabSectionState extends State<TabSection>
             indicatorWeight: 3,
             labelColor: AppColors.primary,
             unselectedLabelColor: AppColors.lightText,
-            labelStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-            ),
-            unselectedLabelStyle: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-
             tabs: const [
               Tab(text: "Chats"),
               Tab(text: "Status"),
@@ -61,21 +58,18 @@ class TabSectionState extends State<TabSection>
           ),
         ),
         Expanded(
-          child: Container(
-            color: AppColors.background,
-            child: TabBarView(
-              controller: controller,
-              children: [
-                ChatPage(key: chatPageKey),
-                StatusListPage(),
-                const Center(
-                  child: Text(
-                    "Calls page",
-                    style: TextStyle(color: AppColors.lightText),
-                  ),
+          child: TabBarView(
+            controller: controller,
+            children: [
+              ChatPage(key: chatPageKey),
+              StatusListPage(),
+              const Center(
+                child: Text(
+                  "Calls page",
+                  style: TextStyle(color: AppColors.lightText),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],

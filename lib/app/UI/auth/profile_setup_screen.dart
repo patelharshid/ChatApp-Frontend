@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chatapp/app/UI/auth/homePage.dart';
+import 'package:chatapp/app/UI/auth/home_screen.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
@@ -96,7 +96,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => const Homepage()),
+        MaterialPageRoute(builder: (_) => const HomeScreen()),
       );
     } catch (e) {
       setState(() {
