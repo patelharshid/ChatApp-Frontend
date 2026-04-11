@@ -28,7 +28,7 @@ class ChTextField extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           BoxShadow(
-            color: AppColors.colorBlack.withOpacity(0.4),
+            color: AppColors.black.withOpacity(0.4),
             blurRadius: 15,
             offset: const Offset(0, 6),
           ),
@@ -39,7 +39,7 @@ class ChTextField extends StatelessWidget {
           if (prefix != null) prefix!,
           if (showDivider && prefix != null) ...[
             const SizedBox(width: 12),
-            Container(height: 22, width: 1.2, color: AppColors.colorGrey),
+            Container(height: 22, width: 1.2, color: AppColors.grey),
             const SizedBox(width: 12),
           ],
           Expanded(
@@ -48,12 +48,12 @@ class ChTextField extends StatelessWidget {
               keyboardType: keyboardType,
               maxLength: maxLength,
               cursorColor: AppColors.primary,
-              style: const TextStyle(color: AppColors.colorWhite),
+              style: const TextStyle(color: AppColors.white),
               decoration: InputDecoration(
                 counterText: "",
                 border: InputBorder.none,
                 hintText: hintText,
-                hintStyle: const TextStyle(color: AppColors.colorGrey),
+                hintStyle: const TextStyle(color: AppColors.grey),
               ),
             ),
           ),

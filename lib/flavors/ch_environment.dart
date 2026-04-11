@@ -4,15 +4,14 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class ChEnvironment {
-  static String currentEnv = "";
   static String apiUrl = "";
+
   static Future<void> initialize(String env) async {
+    final dio = Dio();
     WidgetsFlutterBinding.ensureInitialized();
 
-    currentEnv = env;
-
     if (env == 'dev') {
-      apiUrl = 'http://192.168.242.76:8081';
+      apiUrl = 'http://192.168.239.76:8081';
     } else if (env == 'uat') {
       apiUrl =
           'https://dentory-api-dev-ckhxaagjfxg3f5fz.centralus-01.azurewebsites.net';
@@ -21,8 +20,6 @@ class ChEnvironment {
     }
 
     AppUrls.baseUrl = apiUrl;
-
-    final dio = Dio();
     dio.interceptors.add(ChInterceptors());
   }
 }

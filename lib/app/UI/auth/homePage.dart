@@ -1,4 +1,4 @@
-import 'package:chatapp/app/UI/auth/loginPage.dart';
+import 'package:chatapp/app/UI/auth/login_screen.dart';
 import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/UI/chat/contactPage.dart';
 import 'package:chatapp/app/UI/auth/tabSection.dart';
@@ -21,7 +21,7 @@ class _ChatHomePageState extends State<Homepage> {
     CommonService.clearSharedPreferences();
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const LoginPage()),
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
       (_) => false,
     );
   }
@@ -49,7 +49,7 @@ class _ChatHomePageState extends State<Homepage> {
             splashRadius: 22,
             icon: const Icon(
               Icons.camera_alt_outlined,
-              color: AppColors.colorWhite,
+              color: AppColors.white,
             ),
             onPressed: () {},
           ),
@@ -79,21 +79,21 @@ class _ChatHomePageState extends State<Homepage> {
                 value: 'group',
                 child: Text(
                   "New Group",
-                  style: TextStyle(color: AppColors.colorWhite),
+                  style: TextStyle(color: AppColors.white),
                 ),
               ),
               PopupMenuItem(
                 value: 'profile',
                 child: Text(
                   "Profile",
-                  style: TextStyle(color: AppColors.colorWhite),
+                  style: TextStyle(color: AppColors.white),
                 ),
               ),
               PopupMenuItem(
                 value: 'logout',
                 child: Text(
                   "Logout",
-                  style: TextStyle(color: AppColors.errorColor),
+                  style: TextStyle(color: AppColors.error),
                 ),
               ),
             ],
@@ -115,7 +115,7 @@ class _ChatHomePageState extends State<Homepage> {
             tabKey.currentState?.refreshChats();
           }
         },
-        child: const Icon(Icons.chat, color: AppColors.colorBlack),
+        child: const Icon(Icons.chat, color: AppColors.black),
       ),
     );
   }

@@ -1,5 +1,5 @@
 import 'package:chatapp/app/UI/auth/homePage.dart';
-import 'package:chatapp/app/UI/auth/loginPage.dart';
+import 'package:chatapp/app/UI/auth/login_screen.dart';
 import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/flavors/ch_environment.dart';
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       home: FutureBuilder(
-        future: _startPage(),
+        future: getInitialPage(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
             return const Center(child: CircularProgressIndicator());
@@ -31,11 +31,11 @@ class MyApp extends StatelessWidget {
     );
   }
 
-  Future<Widget> _startPage() async {
+  Future<Widget> getInitialPage() async {
     final token = await CommonService.getSessionToken();
     final userId = await CommonService.getUserId();
     if (token == null || token.isEmpty) {
-      return const LoginPage();
+      return const LoginScreen();
     }
     if (userId == null || userId.isEmpty) {
       return const ProfileSetupPage();

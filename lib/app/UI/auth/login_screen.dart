@@ -1,18 +1,19 @@
-import 'package:chatapp/app/UI/auth/otpVerificationPage.dart';
+import 'package:chatapp/app/UI/auth/otp_verification_screen.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/values/app_constants.dart';
 import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/core/widget/ch_text_field.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final LoginRepo loginRepo = LoginRepo();
@@ -20,37 +21,64 @@ class _LoginPageState extends State<LoginPage> {
   bool isLoading = false;
   String? error;
 
-  Future<void> validateAndSubmit() async {
+  Future<void> handleLogin() async {
+    final phone = phoneController.text.trim();
+    final email = emailController.text.trim();
+
+    final validationError = _validateInputs(phone, email);
+    if (validationError != null) {
+      setState(() => error = validationError);
+      return;
+    }
+
     setState(() {
       isLoading = true;
       error = null;
     });
 
-    final phone = phoneController.text.trim();
-    final email = emailController.text.trim();
-
-    if (!RegExp(
-      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-    ).hasMatch(email)) {
-      setState(() {
-        isLoading = false;
-        error = "Please enter a valid email address";
-      });
-      return;
-    }
-
     try {
       await loginRepo.login(phone, email);
+
       if (!mounted) return;
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => Otpverificationpage(phone: phone)),
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(phoneNumber: phone),
+        ),
       );
-    } catch (_) {
+    } catch (e) {
+      setState(() {
+        error = "Login failed. Try again.";
+      });
     } finally {
-      if (mounted) setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
+  }
+
+  String? _validateInputs(String phone, String email) {
+    if (phone.isEmpty || phone.length != 10) {
+      return "Enter a valid phone number";
+    }
+
+    final emailRegex = RegExp(
+      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+    );
+
+    if (!emailRegex.hasMatch(email)) {
+      return "Please enter a valid email address";
+    }
+
+    return null;
+  }
+
+  @override
+  void dispose() {
+    phoneController.dispose();
+    emailController.dispose();
+    super.dispose();
   }
 
   @override
@@ -68,7 +96,9 @@ class _LoginPageState extends State<LoginPage> {
         ),
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppConstants.paddingLG,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -78,8 +108,10 @@ class _LoginPageState extends State<LoginPage> {
                     height: 80,
                     width: 80,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF121212),
-                      borderRadius: BorderRadius.circular(22),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(
+                        AppConstants.radiusLG,
+                      ),
                       boxShadow: [
                         BoxShadow(
                           color: AppColors.primary.withValues(alpha: 0.4),
@@ -91,12 +123,12 @@ class _LoginPageState extends State<LoginPage> {
                     child: const Icon(
                       Icons.message,
                       color: AppColors.primary,
-                      size: 45,
+                      size: AppConstants.iconLG,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: AppConstants.paddingLG),
 
                 const Text(
                   "Enter your phone number",
@@ -104,19 +136,19 @@ class _LoginPageState extends State<LoginPage> {
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: AppColors.colorWhite,
+                    color: AppColors.white,
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                const SizedBox(height: AppConstants.paddingXS),
 
                 const Text(
                   "We'll send you a verification code to confirm your number",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 15),
+                  style: TextStyle(color: AppColors.lightText, fontSize: 15),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: AppConstants.paddingXL),
 
                 ChTextField(
                   controller: phoneController,
@@ -127,13 +159,13 @@ class _LoginPageState extends State<LoginPage> {
                   prefix: const Text(
                     "+91",
                     style: TextStyle(
-                      color: AppColors.colorWhite,
+                      color: AppColors.white,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppConstants.paddingMD),
 
                 ChTextField(
                   controller: emailController,
@@ -141,16 +173,18 @@ class _LoginPageState extends State<LoginPage> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: AppConstants.paddingMD),
 
                 if (error != null)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.only(
+                      bottom: AppConstants.paddingSM,
+                    ),
                     child: Text(
                       error!,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
-                        color: AppColors.errorColor,
+                        color: AppColors.error,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -160,8 +194,8 @@ class _LoginPageState extends State<LoginPage> {
                 ChButton(
                   title: "Send Code",
                   isLoading: isLoading,
-                  onPressed: validateAndSubmit,
-                  textColor: AppColors.colorBlack,
+                  onPressed: handleLogin,
+                  textColor: AppColors.black,
                 ),
               ],
             ),

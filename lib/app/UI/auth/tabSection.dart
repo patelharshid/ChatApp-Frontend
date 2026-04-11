@@ -1,4 +1,5 @@
 import 'package:chatapp/app/UI/chat/chatPage.dart';
+import 'package:chatapp/app/UI/status/statusListPage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -66,12 +67,7 @@ class TabSectionState extends State<TabSection>
               controller: controller,
               children: [
                 ChatPage(key: chatPageKey),
-                const Center(
-                  child: Text(
-                    "Status page",
-                    style: TextStyle(color: AppColors.lightText),
-                  ),
-                ),
+                StatusListPage(),
                 const Center(
                   child: Text(
                     "Calls page",

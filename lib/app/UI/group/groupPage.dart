@@ -135,7 +135,7 @@ class _GroupPageState extends State<GroupPage> {
                       style: TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
-                        color: AppColors.colorWhite,
+                        color: AppColors.white,
                       ),
                     ),
 
@@ -190,7 +190,7 @@ class _GroupPageState extends State<GroupPage> {
                     _fieldContainer(
                       child: TextField(
                         controller: _groupNameController,
-                        style: const TextStyle(color: AppColors.colorWhite),
+                        style: const TextStyle(color: AppColors.white),
                         decoration: const InputDecoration(
                           border: InputBorder.none,
                           hintText: "Enter group name",
@@ -245,7 +245,7 @@ class _GroupPageState extends State<GroupPage> {
                           await _createGroup();
                         },
                         backgroundColor: AppColors.primary,
-                        textColor: AppColors.colorBlack,
+                        textColor: AppColors.black,
                         radius: 14,
                       ),
                     ),
@@ -267,13 +267,13 @@ class _GroupPageState extends State<GroupPage> {
       appBar: AppBar(
         backgroundColor: AppColors.surface,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        iconTheme: const IconThemeData(color: AppColors.white),
         title: Text(
           selectedIndexes.isEmpty
               ? "Add participants"
               : "${selectedIndexes.length} selected",
           style: const TextStyle(
-            color: AppColors.colorWhite,
+            color: AppColors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -311,11 +311,11 @@ class _GroupPageState extends State<GroupPage> {
                                         : FileImage(File(user.profileUrl!)))
                                     as ImageProvider
                               : null,
-                          backgroundColor: AppColors.colorGrey,
+                          backgroundColor: AppColors.grey,
                           child: user.profileUrl == null
                               ? const Icon(
                                   Icons.person,
-                                  color: AppColors.colorWhite,
+                                  color: AppColors.white,
                                 )
                               : null,
                         ),
@@ -338,7 +338,7 @@ class _GroupPageState extends State<GroupPage> {
                     title: Text(
                       user.username ?? "",
                       style: const TextStyle(
-                        color: AppColors.colorWhite,
+                        color: AppColors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -361,7 +361,7 @@ class _GroupPageState extends State<GroupPage> {
             ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: selectedIndexes.isEmpty
-            ? AppColors.colorGrey
+            ? AppColors.grey
             : AppColors.primary,
         onPressed: selectedIndexes.isEmpty ? null : _showCreateGroupDialog,
         child: const Icon(Icons.arrow_forward),

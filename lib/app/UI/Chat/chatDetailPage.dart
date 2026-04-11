@@ -150,7 +150,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
       backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: AppColors.surface,
-        iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        iconTheme: const IconThemeData(color: AppColors.white),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -164,7 +164,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
             const SizedBox(width: 8),
             CircleAvatar(
               radius: 18,
-              backgroundColor: AppColors.colorGrey,
+              backgroundColor: AppColors.grey,
               backgroundImage:
                   widget.profileUrl != null && widget.profileUrl!.isNotEmpty
                   ? (widget.profileUrl!.startsWith("http")
@@ -173,7 +173,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
                         as ImageProvider
                   : null,
               child: widget.profileUrl == null || widget.profileUrl!.isEmpty
-                  ? const Icon(Icons.person, color: AppColors.colorWhite)
+                  ? const Icon(Icons.person, color: AppColors.white)
                   : null,
             ),
             const SizedBox(width: 10),
@@ -181,7 +181,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
               child: Text(
                 widget.userName,
                 style: const TextStyle(
-                  color: AppColors.colorWhite,
+                  color: AppColors.white,
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
@@ -232,8 +232,8 @@ class _ChatDetailState extends State<ChatDetailPage> {
                             msg.content,
                             style: TextStyle(
                               color: isMe
-                                  ? AppColors.colorBlack
-                                  : AppColors.colorWhite,
+                                  ? AppColors.black
+                                  : AppColors.white,
                             ),
                           ),
                         ),
@@ -262,7 +262,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
               ),
               child: TextField(
                 controller: _messageController,
-                style: const TextStyle(color: AppColors.colorWhite),
+                style: const TextStyle(color: AppColors.white),
                 decoration: const InputDecoration(
                   hintText: "Type a message",
                   hintStyle: TextStyle(color: AppColors.lightText),
@@ -280,7 +280,7 @@ class _ChatDetailState extends State<ChatDetailPage> {
             child: IconButton(
               icon: Icon(
                 isTyping ? Icons.send : Icons.mic,
-                color: AppColors.colorBlack,
+                color: AppColors.black,
               ),
               onPressed: isTyping ? sendMessage : null,
             ),

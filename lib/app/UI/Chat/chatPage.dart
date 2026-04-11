@@ -99,14 +99,14 @@ class ChatPageState extends State<ChatPage> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: const BoxDecoration(
                 border: Border(
-                  bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
+                  bottom: BorderSide(color: AppColors.grey, width: 0.3),
                 ),
               ),
               child: Row(
                 children: [
                   CircleAvatar(
                     radius: 22,
-                    backgroundColor: AppColors.colorGrey,
+                    backgroundColor: AppColors.grey,
                     backgroundImage:
                         user.profileUrl != null && user.profileUrl!.isNotEmpty
                         ? (user.profileUrl!.startsWith("http")
@@ -130,7 +130,7 @@ class ChatPageState extends State<ChatPage> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            color: AppColors.colorWhite,
+                            color: AppColors.white,
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),

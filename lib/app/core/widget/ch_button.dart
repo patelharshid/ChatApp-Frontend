@@ -19,7 +19,7 @@ class ChButton extends StatelessWidget {
     this.isLoading = false,
     this.isDisabled = false,
     this.backgroundColor = AppColors.primary,
-    this.textColor = AppColors.colorWhite,
+    this.textColor = AppColors.white,
     this.fontSize = 16,
     this.verticalPadding = 14,
     this.radius = 20,
@@ -50,7 +50,7 @@ class ChButton extends StatelessWidget {
                   width: 22,
                   child: CircularProgressIndicator(
                     strokeWidth: 2.5,
-                    color: AppColors.colorBlack,
+                    color: AppColors.black,
                   ),
                 )
               : Text(

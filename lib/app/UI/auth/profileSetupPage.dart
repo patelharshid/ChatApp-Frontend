@@ -103,7 +103,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
         title: Text(
           "Create Profile",
           style: const TextStyle(
-            color: AppColors.colorWhite,
+            color: AppColors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -167,7 +167,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
             const Text(
               "Name",
               style: TextStyle(
-                color: AppColors.colorWhite,
+                color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -176,7 +176,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
             _fieldContainer(
               child: TextField(
                 controller: nameController,
-                style: const TextStyle(color: AppColors.colorWhite),
+                style: const TextStyle(color: AppColors.white),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: "Enter your name",
@@ -190,7 +190,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
             const Text(
               "Status Message",
               style: TextStyle(
-                color: AppColors.colorWhite,
+                color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -202,7 +202,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
                   Expanded(
                     child: TextField(
                       controller: statusController,
-                      style: const TextStyle(color: AppColors.colorWhite),
+                      style: const TextStyle(color: AppColors.white),
                       decoration: const InputDecoration(
                         border: InputBorder.none,
                         hintText: "What's on your mind?",
@@ -220,7 +220,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
             const Text(
               "Bio",
               style: TextStyle(
-                color: AppColors.colorWhite,
+                color: AppColors.white,
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
               ),
@@ -232,7 +232,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
                 controller: bioController,
                 maxLines: 3,
                 maxLength: 120,
-                style: const TextStyle(color: AppColors.colorWhite),
+                style: const TextStyle(color: AppColors.white),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: "Tell us about yourself...",
@@ -249,7 +249,7 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
               onPressed: addUser,
               isDisabled: isButtonDisabled,
               backgroundColor: AppColors.primary,
-              textColor: AppColors.colorBlack,
+              textColor: AppColors.black,
               radius: 14,
             ),
             const SizedBox(height: 30),

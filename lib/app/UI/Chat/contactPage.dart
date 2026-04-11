@@ -46,17 +46,17 @@ class _ContactPageState extends State<ContactPage> {
         backgroundColor: AppColors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.colorWhite),
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
           onPressed: () {
             Navigator.pop(context, true);
           },
         ),
-        iconTheme: const IconThemeData(color: AppColors.colorWhite),
+        iconTheme: const IconThemeData(color: AppColors.white),
 
         title: const Text(
           "Select contact",
           style: TextStyle(
-            color: AppColors.colorWhite,
+            color: AppColors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
           ),
@@ -110,13 +110,13 @@ class _ContactPageState extends State<ContactPage> {
             CircleAvatar(
               radius: 24,
               backgroundColor: AppColors.primary,
-              child: const Icon(Icons.group_add, color: AppColors.colorBlack),
+              child: const Icon(Icons.group_add, color: AppColors.black),
             ),
             const SizedBox(width: 16),
             const Text(
               "New group",
               style: TextStyle(
-                color: AppColors.colorWhite,
+                color: AppColors.white,
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
               ),
@@ -145,14 +145,14 @@ class _ContactPageState extends State<ContactPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
         decoration: const BoxDecoration(
           border: Border(
-            bottom: BorderSide(color: AppColors.colorGrey, width: 0.3),
+            bottom: BorderSide(color: AppColors.grey, width: 0.3),
           ),
         ),
         child: Row(
           children: [
             CircleAvatar(
               radius: 24,
-              backgroundColor: AppColors.colorGrey,
+              backgroundColor: AppColors.grey,
               backgroundImage: user.profileUrl != null
                   ? (user.profileUrl!.startsWith("http")
                             ? NetworkImage(user.profileUrl!)
@@ -173,7 +173,7 @@ class _ContactPageState extends State<ContactPage> {
                   Text(
                     user.username ?? "",
                     style: const TextStyle(
-                      color: AppColors.colorWhite,
+                      color: AppColors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
