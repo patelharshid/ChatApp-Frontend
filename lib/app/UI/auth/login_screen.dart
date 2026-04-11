@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingLG),
+                const SizedBox(height: AppConstants.heightLG),
 
                 const Text(
                   "Enter your phone number",
@@ -140,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingXS),
+                const SizedBox(height: AppConstants.heightXS),
 
                 const Text(
                   "We'll send you a verification code to confirm your number",
@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(color: AppColors.lightText, fontSize: 15),
                 ),
 
-                const SizedBox(height: AppConstants.paddingXL),
+                const SizedBox(height: AppConstants.heightXL),
 
                 ChTextField(
                   controller: phoneController,
@@ -165,7 +165,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingMD),
+                const SizedBox(height: AppConstants.heightMD),
 
                 ChTextField(
                   controller: emailController,
@@ -173,7 +173,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   keyboardType: TextInputType.emailAddress,
                 ),
 
-                const SizedBox(height: AppConstants.paddingMD),
+                const SizedBox(height: AppConstants.heightMD),
 
                 if (error != null)
                   Padding(

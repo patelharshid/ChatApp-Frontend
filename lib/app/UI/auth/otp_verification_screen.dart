@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
+import 'package:chatapp/app/UI/auth/profile_setup_screen.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
@@ -79,7 +79,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
+        MaterialPageRoute(builder: (_) => const ProfileSetupScreen()),
       );
     } catch (e) {
       setState(() {
@@ -92,7 +92,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     }
   }
 
-  /// 🔹 Resend OTP
   Future<void> resendOtpCode() async {
     if (!canResendOtp) return;
 
@@ -144,7 +143,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             ),
             child: Column(
               children: [
-                const SizedBox(height: AppConstants.paddingXL),
+                const SizedBox(height: AppConstants.heightXL),
 
                 Container(
                   height: 90,
@@ -167,7 +166,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingLG),
+                const SizedBox(height: AppConstants.heightLG),
 
                 const Text(
                   "Enter verification code",
@@ -178,7 +177,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingXS),
+                const SizedBox(height: AppConstants.heightXS),
 
                 Text(
                   "We've sent a 6-digit code to +91\n${widget.phoneNumber}",
@@ -189,7 +188,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   ),
                 ),
 
-                const SizedBox(height: AppConstants.paddingXL),
+                const SizedBox(height: AppConstants.heightXL),
 
                 OtpTextField(
                   numberOfFields: 6,
@@ -219,7 +218,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   },
                 ),
 
-                const SizedBox(height: AppConstants.paddingLG),
+                const SizedBox(height: AppConstants.heightLG),
 
                 if (otpErrorMessage != null)
                   Padding(
@@ -243,7 +242,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                   textColor: AppColors.black,
                 ),
 
-                const SizedBox(height: AppConstants.paddingMD),
+                const SizedBox(height: AppConstants.heightMD),
 
                 TextButton(
                   onPressed: canResendOtp ? resendOtpCode : null,

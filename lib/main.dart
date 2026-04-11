@@ -1,6 +1,5 @@
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/UI/auth/login_screen.dart';
-import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/flavors/ch_environment.dart';
 import 'package:flutter/material.dart';
@@ -33,12 +32,8 @@ class MyApp extends StatelessWidget {
 
   Future<Widget> getInitialPage() async {
     final token = await CommonService.getSessionToken();
-    final userId = await CommonService.getUserId();
     if (token == null || token.isEmpty) {
       return const LoginScreen();
-    }
-    if (userId == null || userId.isEmpty) {
-      return const ProfileSetupPage();
     }
     return const Homepage();
   }

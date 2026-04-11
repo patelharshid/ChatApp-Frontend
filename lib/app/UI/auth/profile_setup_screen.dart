@@ -3,45 +3,51 @@ import 'dart:io';
 import 'package:chatapp/app/UI/auth/homePage.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/values/app_constants.dart';
 import 'package:chatapp/app/core/widget/ch_button.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-class ProfileSetupPage extends StatefulWidget {
-  const ProfileSetupPage({super.key});
+class ProfileSetupScreen extends StatefulWidget {
+  const ProfileSetupScreen({super.key});
 
   @override
-  State<ProfileSetupPage> createState() => ProfileSetupPageState();
+  State<ProfileSetupScreen> createState() => _ProfileSetupScreenState();
 }
 
-class ProfileSetupPageState extends State<ProfileSetupPage> {
+class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController statusController = TextEditingController();
   final TextEditingController bioController = TextEditingController();
 
-  File? selectedImage;
   final ImagePicker _picker = ImagePicker();
+  final LoginRepo loginRepo = LoginRepo();
 
   final profileUrl =
       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRaAsJaTD22xdCgfrjTCJzLQmODiZ-tYaXisA&s";
 
-  final LoginRepo loginRepo = LoginRepo();
+  File? selectedImage;
   bool isLoading = false;
+  String? errorMessage;
 
-  bool get isButtonDisabled =>
-      nameController.text.trim().isEmpty &&
-      statusController.text.trim().isEmpty;
+  bool get isButtonDisabled => nameController.text.trim().isEmpty;
 
   @override
   void initState() {
     super.initState();
-    nameController.addListener(_onTextChanged);
-    statusController.addListener(_onTextChanged);
+    nameController.addListener(_refreshUI);
+    statusController.addListener(_refreshUI);
   }
 
-  void _onTextChanged() {
-    setState(() {});
+  void _refreshUI() => setState(() {});
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    statusController.dispose();
+    bioController.dispose();
+    super.dispose();
   }
 
   Future<void> pickImage() async {
@@ -54,37 +60,66 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
     }
   }
 
-  Future<void> addUser() async {
-    setState(() => isLoading = true);
+  String? validateInputs() {
+    if (nameController.text.trim().isEmpty) {
+      return "Name is required";
+    }
+    if (selectedImage == null) {
+      return "Profile image is required";
+    }
+    return null;
+  }
+
+  Future<void> createUserProfile() async {
+    final validationError = validateInputs();
+    if (validationError != null) {
+      setState(() => errorMessage = validationError);
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
     try {
       final res = await loginRepo.addUser(
         nameController.text.trim(),
         statusController.text.trim(),
         bioController.text.trim(),
-        selectedImage?.path ?? profileUrl,
+        selectedImage?.path ?? profileUrl
       );
 
-      CommonService.setUserId(res['data']['userId'].toString());
+      await CommonService.setUserId(res['data']['userId'].toString());
 
       if (!mounted) return;
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const Homepage()),
       );
+    } catch (e) {
+      setState(() {
+        errorMessage = "Failed to create profile";
+      });
     } finally {
-      setState(() => isLoading = false);
+      if (mounted) {
+        setState(() => isLoading = false);
+      }
     }
   }
 
   Widget _fieldContainer({
     required Widget child,
-    EdgeInsets padding = const EdgeInsets.symmetric(horizontal: 14),
+    EdgeInsets padding = const EdgeInsets.symmetric(
+      horizontal: AppConstants.paddingMD,
+    ),
   }) {
     return Container(
       padding: padding,
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppConstants.radiusMD),
         border: Border.all(color: AppColors.primary),
       ),
       child: child,
@@ -96,13 +131,12 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        automaticallyImplyLeading: true,
         backgroundColor: AppColors.background,
         elevation: 0,
         centerTitle: true,
-        title: Text(
+        title: const Text(
           "Create Profile",
-          style: const TextStyle(
+          style: TextStyle(
             color: AppColors.white,
             fontSize: 18,
             fontWeight: FontWeight.w600,
@@ -111,11 +145,11 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
       ),
 
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.symmetric(horizontal: AppConstants.paddingLG),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 40),
+            const SizedBox(height: AppConstants.heightXXL),
 
             Center(
               child: GestureDetector(
@@ -127,13 +161,6 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
                     shape: BoxShape.circle,
                     color: AppColors.surface,
                     border: Border.all(color: AppColors.primary, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withValues(alpha: 0.4),
-                        blurRadius: 15,
-                        offset: const Offset(0, 8),
-                      ),
-                    ],
                   ),
                   child: selectedImage != null
                       ? ClipOval(
@@ -145,15 +172,14 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
                             Icon(
                               Icons.camera_alt,
                               color: AppColors.primary,
-                              size: 32,
+                              size: AppConstants.iconMD,
                             ),
-                            SizedBox(height: 6),
+                            SizedBox(height: AppConstants.heightXS),
                             Text(
                               "Add Photo",
                               style: TextStyle(
                                 color: AppColors.primary,
                                 fontSize: 13,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -162,17 +188,10 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
               ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: AppConstants.heightXXL),
 
-            const Text(
-              "Name",
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
+            const Text("Name", style: TextStyle(color: AppColors.white)),
+            const SizedBox(height: AppConstants.heightXS),
             _fieldContainer(
               child: TextField(
                 controller: nameController,
@@ -185,53 +204,31 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: AppConstants.heightLG),
 
-            const Text(
-              "Status Message",
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
+            const Text("Status", style: TextStyle(color: AppColors.white)),
+            const SizedBox(height: AppConstants.heightXS),
             _fieldContainer(
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: statusController,
-                      style: const TextStyle(color: AppColors.white),
-                      decoration: const InputDecoration(
-                        border: InputBorder.none,
-                        hintText: "What's on your mind?",
-                        hintStyle: TextStyle(color: AppColors.lightText),
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.emoji_emotions, color: AppColors.primary),
-                ],
+              child: TextField(
+                controller: statusController,
+                style: const TextStyle(color: AppColors.white),
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "What's on your mind?",
+                  hintStyle: TextStyle(color: AppColors.lightText),
+                ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: AppConstants.heightLG),
 
-            const Text(
-              "Bio",
-              style: TextStyle(
-                color: AppColors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 6),
+            const Text("Bio", style: TextStyle(color: AppColors.white)),
+            const SizedBox(height: AppConstants.heightXS),
             _fieldContainer(
-              padding: const EdgeInsets.all(14),
+              padding: const EdgeInsets.all(AppConstants.paddingMD),
               child: TextField(
                 controller: bioController,
                 maxLines: 3,
-                maxLength: 120,
                 style: const TextStyle(color: AppColors.white),
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -241,18 +238,25 @@ class ProfileSetupPageState extends State<ProfileSetupPage> {
               ),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: AppConstants.heightMD),
+
+            if (errorMessage != null)
+              Text(
+                errorMessage!,
+                style: const TextStyle(color: AppColors.error),
+              ),
+
+            const SizedBox(height: AppConstants.heightMD),
 
             ChButton(
               title: "Continue",
               isLoading: isLoading,
-              onPressed: addUser,
+              onPressed: createUserProfile,
               isDisabled: isButtonDisabled,
-              backgroundColor: AppColors.primary,
               textColor: AppColors.black,
-              radius: 14,
             ),
-            const SizedBox(height: 30),
+
+            const SizedBox(height: AppConstants.heightLG),
           ],
         ),
       ),

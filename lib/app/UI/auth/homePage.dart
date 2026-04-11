@@ -1,5 +1,5 @@
 import 'package:chatapp/app/UI/auth/login_screen.dart';
-import 'package:chatapp/app/UI/auth/profileSetupPage.dart';
+import 'package:chatapp/app/UI/auth/profile_setup_screen.dart';
 import 'package:chatapp/app/UI/chat/contactPage.dart';
 import 'package:chatapp/app/UI/auth/tabSection.dart';
 import 'package:chatapp/app/UI/group/groupPage.dart';
@@ -66,7 +66,7 @@ class _ChatHomePageState extends State<Homepage> {
                 case 'profile':
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (_) => const ProfileSetupPage()),
+                    MaterialPageRoute(builder: (_) => const ProfileSetupScreen()),
                   );
                   break;
                 case 'logout':
