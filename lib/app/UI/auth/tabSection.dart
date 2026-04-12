@@ -14,22 +14,13 @@ class TabSectionState extends State<TabSection>
     with SingleTickerProviderStateMixin {
   late TabController controller;
 
-  final GlobalKey<ChatPageState> chatPageKey = GlobalKey<ChatPageState>();
-
-  int get currentIndex => controller.index;
-
   @override
   void initState() {
     super.initState();
     controller = TabController(length: 3, vsync: this);
-
     controller.addListener(() {
       setState(() {});
     });
-  }
-
-  void refreshChats() {
-    chatPageKey.currentState?.fetchChatUsers();
   }
 
   @override
@@ -61,7 +52,7 @@ class TabSectionState extends State<TabSection>
           child: TabBarView(
             controller: controller,
             children: [
-              ChatPage(key: chatPageKey),
+              ChatPage(),
               StatusListPage(),
               const Center(
                 child: Text(
