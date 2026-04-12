@@ -1,4 +1,4 @@
-import 'package:chatapp/app/UI/auth/homePage.dart';
+import 'package:chatapp/app/UI/auth/home_screen.dart';
 import 'package:chatapp/app/UI/auth/login_screen.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/flavors/ch_environment.dart';
@@ -35,6 +35,6 @@ class MyApp extends StatelessWidget {
     if (token == null || token.isEmpty) {
       return const LoginScreen();
     }
-    return const Homepage();
+    return const HomeScreen();
   }
 }

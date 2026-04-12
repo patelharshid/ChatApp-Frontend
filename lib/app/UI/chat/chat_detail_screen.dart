@@ -1,18 +1,19 @@
 import 'dart:io';
 
 import 'package:chatapp/app/core/services/common_service.dart';
+import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/values/app_constants.dart';
 import 'package:chatapp/app/data/model/message_model.dart';
 import 'package:chatapp/app/data/repository/chat_reop.dart';
-import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:flutter/material.dart';
 
-class ChatDetailPage extends StatefulWidget {
+class ChatDetailScreen extends StatefulWidget {
   final int userId;
   final String userName;
   final String? profileUrl;
 
-  const ChatDetailPage({
+  const ChatDetailScreen({
     super.key,
     required this.userId,
     required this.userName,
@@ -20,10 +21,10 @@ class ChatDetailPage extends StatefulWidget {
   });
 
   @override
-  State<ChatDetailPage> createState() => _ChatDetailState();
+  State<ChatDetailScreen> createState() => _ChatDetailScreenState();
 }
 
-class _ChatDetailState extends State<ChatDetailPage> {
+class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -35,9 +36,6 @@ class _ChatDetailState extends State<ChatDetailPage> {
   bool isTyping = false;
   int? loggedInUserId;
 
-  bool isSelectionMode = false;
-  Set<String> selectedMessageIds = {};
-
   @override
   void initState() {
     super.initState();
@@ -48,10 +46,10 @@ class _ChatDetailState extends State<ChatDetailPage> {
     final id = await CommonService.getUserId();
     loggedInUserId = int.tryParse(id ?? '');
     await fetchMessages();
-    connectSocket();
+    _connectSocket();
   }
 
-  void connectSocket() {
+  void _connectSocket() {
     if (loggedInUserId == null) return;
 
     _socketService.connectUser(loggedInUserId!);
@@ -67,27 +65,28 @@ class _ChatDetailState extends State<ChatDetailPage> {
         "contentType": data["contentType"] ?? "text",
         "senderId": data["senderId"],
         "receiverId": data["receiverId"],
-        "createdAt": data["createdAt"] ?? DateTime.now().toIso8601String(),
+        "createdAt": data["createdAt"],
         "sentByMe": false,
       });
 
-      setState(() {
-        messages.add(msg);
-      });
+      if (!mounted) return;
 
-      _scrollToBottom();
+      setState(() => messages.add(msg));
     });
   }
 
   Future<void> fetchMessages() async {
     try {
       final res = await _repo.getMessageList(widget.userId);
+
+      if (!mounted) return;
+
       setState(() {
         messages = res;
         isLoading = false;
       });
-      _scrollToBottom();
     } catch (_) {
+      if (!mounted) return;
       setState(() => isLoading = false);
     }
   }
@@ -122,61 +121,77 @@ class _ChatDetailState extends State<ChatDetailPage> {
     });
 
     _messageController.clear();
-    _scrollToBottom();
-  }
-
-  void _scrollToBottom() {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 
   @override
   void dispose() {
+    _socketService.disconnect();
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Widget _buildAvatar() {
+    if (widget.profileUrl == null || widget.profileUrl!.isEmpty) {
+      return const CircleAvatar(
+        radius: 18,
+        backgroundColor: AppColors.grey,
+        child: Icon(Icons.person, color: AppColors.white),
+      );
+    }
+
+    final image = widget.profileUrl!.startsWith("http")
+        ? NetworkImage(widget.profileUrl!)
+        : FileImage(File(widget.profileUrl!)) as ImageProvider;
+
+    return CircleAvatar(
+      radius: 18,
+      backgroundColor: AppColors.grey,
+      backgroundImage: image,
+    );
+  }
+
+  Widget _buildMessageItem(MessageModel msg) {
+    final isMe = msg.sentByMe;
+
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        margin: const EdgeInsets.symmetric(vertical: AppConstants.paddingXS),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppConstants.paddingMD,
+          vertical: AppConstants.paddingSM,
+        ),
+        decoration: BoxDecoration(
+          color: isMe ? AppColors.primary : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppConstants.radiusMD),
+        ),
+        child: Text(
+          msg.content,
+          style: TextStyle(color: isMe ? AppColors.black : AppColors.white),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
+
       appBar: AppBar(
         backgroundColor: AppColors.surface,
-        iconTheme: const IconThemeData(color: AppColors.white),
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            _socketService.disconnect();
-            Navigator.pop(context);
-          },
+          icon: const Icon(Icons.arrow_back, color: AppColors.white),
+          onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
         title: Row(
           children: [
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.grey,
-              backgroundImage:
-                  widget.profileUrl != null && widget.profileUrl!.isNotEmpty
-                  ? (widget.profileUrl!.startsWith("http")
-                            ? NetworkImage(widget.profileUrl!)
-                            : FileImage(File(widget.profileUrl!)))
-                        as ImageProvider
-                  : null,
-              child: widget.profileUrl == null || widget.profileUrl!.isEmpty
-                  ? const Icon(Icons.person, color: AppColors.white)
-                  : null,
-            ),
-            const SizedBox(width: 10),
+            const SizedBox(width: AppConstants.widthXS),
+            _buildAvatar(),
+            const SizedBox(width: AppConstants.widthSM),
             Expanded(
               child: Text(
                 widget.userName,
@@ -191,14 +206,15 @@ class _ChatDetailState extends State<ChatDetailPage> {
           ],
         ),
         actions: const [
-          Icon(Icons.videocam),
-          SizedBox(width: 12),
-          Icon(Icons.call),
-          SizedBox(width: 12),
-          Icon(Icons.more_vert),
-          SizedBox(width: 8),
+          Icon(Icons.videocam, color: AppColors.white),
+          SizedBox(width: AppConstants.widthSM),
+          Icon(Icons.call, color: AppColors.white),
+          SizedBox(width: AppConstants.widthSM),
+          Icon(Icons.more_vert, color: AppColors.white),
+          SizedBox(width: AppConstants.widthXS),
         ],
       ),
+
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(color: AppColors.primary),
@@ -208,39 +224,13 @@ class _ChatDetailState extends State<ChatDetailPage> {
                 Expanded(
                   child: ListView.builder(
                     controller: _scrollController,
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppConstants.paddingMD),
                     itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = messages[index];
-                      final bool isMe = msg.sentByMe;
-
-                      return Align(
-                        alignment: isMe
-                            ? Alignment.centerRight
-                            : Alignment.centerLeft,
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 14,
-                            vertical: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color: isMe ? AppColors.primary : AppColors.surface,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            msg.content,
-                            style: TextStyle(
-                              color: isMe
-                                  ? AppColors.black
-                                  : AppColors.white,
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                    itemBuilder: (_, index) =>
+                        _buildMessageItem(messages[index]),
                   ),
                 ),
+
                 _buildMessageInput(),
               ],
             ),
@@ -249,16 +239,21 @@ class _ChatDetailState extends State<ChatDetailPage> {
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.all(8),
-      color: const Color.fromARGB(255, 45, 45, 45),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppConstants.paddingSM,
+        vertical: AppConstants.paddingXS,
+      ),
+      color: AppColors.surface,
       child: Row(
         children: [
           Expanded(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingMD,
+              ),
               decoration: BoxDecoration(
-                color: Colors.black45,
-                borderRadius: BorderRadius.circular(24),
+                color: AppColors.background,
+                borderRadius: BorderRadius.circular(AppConstants.radiusLG),
               ),
               child: TextField(
                 controller: _messageController,
@@ -274,7 +269,9 @@ class _ChatDetailState extends State<ChatDetailPage> {
               ),
             ),
           ),
-          const SizedBox(width: 8),
+
+          const SizedBox(width: AppConstants.widthXS),
+
           CircleAvatar(
             backgroundColor: AppColors.primary,
             child: IconButton(

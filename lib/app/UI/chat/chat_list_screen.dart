@@ -1,22 +1,23 @@
 import 'dart:io';
 
-import 'package:chatapp/app/UI/chat/chatDetailPage.dart';
+import 'package:chatapp/app/UI/chat/chat_detail_screen.dart';
 import 'package:chatapp/app/UI/group/groupDetailPage.dart';
 import 'package:chatapp/app/core/helper/date_util.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/values/app_constants.dart';
 import 'package:chatapp/app/data/model/chat_user_detail_model.dart';
 import 'package:chatapp/app/data/repository/chat_reop.dart';
 import 'package:flutter/material.dart';
 
-class ChatPage extends StatefulWidget {
-  const ChatPage({super.key});
+class ChatListScreen extends StatefulWidget {
+  const ChatListScreen({super.key});
 
   @override
-  ChatPageState createState() => ChatPageState();
+  State<ChatListScreen> createState() => _ChatListScreenState();
 }
 
-class ChatPageState extends State<ChatPage> {
-  final ChatReop _repo = ChatReop();
+class _ChatListScreenState extends State<ChatListScreen> {
+  final ChatReop _chatRepository = ChatReop();
 
   List<ChatUserDetailModel> chatUsers = [];
   bool isLoading = true;
@@ -24,13 +25,15 @@ class ChatPageState extends State<ChatPage> {
   @override
   void initState() {
     super.initState();
-    fetchChatUsers();
+    _loadChatUsers();
   }
 
-  Future<void> fetchChatUsers() async {
+  Future<void> _loadChatUsers() async {
     try {
-      final res = await _repo.getChatUsers();
+      final res = await _chatRepository.getChatUsers();
+
       if (!mounted) return;
+
       setState(() {
         chatUsers = res;
         isLoading = false;
@@ -39,6 +42,36 @@ class ChatPageState extends State<ChatPage> {
       if (!mounted) return;
       setState(() => isLoading = false);
     }
+  }
+
+  Future<void> _openChat(ChatUserDetailModel user) async {
+    final isGroup = user.chatType == "GROUP";
+
+    if (isGroup) {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => GroupDetailPage(
+            groupId: user.groupId!,
+            userName: user.name,
+            profileUrl: user.profileUrl ?? '',
+          ),
+        ),
+      );
+    } else {
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => ChatDetailScreen(
+            userId: user.userId!,
+            userName: user.name,
+            profileUrl: user.profileUrl ?? '',
+          ),
+        ),
+      );
+    }
+
+    _loadChatUsers();
   }
 
   @override
@@ -59,44 +92,22 @@ class ChatPageState extends State<ChatPage> {
     }
 
     return RefreshIndicator(
-      onRefresh: fetchChatUsers,
+      onRefresh: _loadChatUsers,
       color: AppColors.primary,
       child: ListView.builder(
+        padding: EdgeInsets.zero,
         itemCount: chatUsers.length,
         itemBuilder: (context, index) {
           final user = chatUsers[index];
-          final bool isGroup = user.chatType == "GROUP";
+          final isGroup = user.chatType == "GROUP";
 
           return InkWell(
-            onTap: () async {
-              if (isGroup) {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => GroupDetailPage(
-                      groupId: user.groupId!,
-                      userName: user.name,
-                      profileUrl: user.profileUrl ?? '',
-                    ),
-                  ),
-                );
-              } else {
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => ChatDetailPage(
-                      userId: user.userId!,
-                      userName: user.name,
-                      profileUrl: user.profileUrl ?? '',
-                    ),
-                  ),
-                );
-              }
-              fetchChatUsers();
-            },
-
+            onTap: () => _openChat(user),
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppConstants.paddingMD,
+                vertical: AppConstants.paddingSM,
+              ),
               decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(color: AppColors.grey, width: 0.3),
@@ -104,22 +115,9 @@ class ChatPageState extends State<ChatPage> {
               ),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundColor: AppColors.grey,
-                    backgroundImage:
-                        user.profileUrl != null && user.profileUrl!.isNotEmpty
-                        ? (user.profileUrl!.startsWith("http")
-                                  ? NetworkImage(user.profileUrl!)
-                                  : FileImage(File(user.profileUrl!)))
-                              as ImageProvider
-                        : null,
-                    child: user.profileUrl == null
-                        ? const Icon(Icons.person, color: Colors.white70)
-                        : null,
-                  ),
+                  _buildProfileImage(user),
 
-                  const SizedBox(width: 14),
+                  const SizedBox(width: AppConstants.widthMD),
 
                   Expanded(
                     child: Column(
@@ -136,19 +134,18 @@ class ChatPageState extends State<ChatPage> {
                           ),
                         ),
 
-                        const SizedBox(height: 6),
+                        const SizedBox(height: AppConstants.heightXS),
 
                         Row(
                           children: [
-                            if (!isGroup && user.messageType == "SENT")
+                            if (!isGroup && user.messageType == "SENT") ...[
                               const Icon(
                                 Icons.done_all,
-                                size: 18,
+                                size: AppConstants.iconSM,
                                 color: AppColors.primary,
                               ),
-
-                            if (!isGroup && user.messageType == "SENT")
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppConstants.widthXS),
+                            ],
 
                             Expanded(
                               child: Text(
@@ -167,7 +164,7 @@ class ChatPageState extends State<ChatPage> {
                     ),
                   ),
 
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppConstants.widthXS),
 
                   Text(
                     user.lastMessageTime != null
@@ -184,6 +181,26 @@ class ChatPageState extends State<ChatPage> {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildProfileImage(ChatUserDetailModel user) {
+    if (user.profileUrl == null || user.profileUrl!.isEmpty) {
+      return const CircleAvatar(
+        radius: 22,
+        backgroundColor: AppColors.grey,
+        child: Icon(Icons.person, color: Colors.white70),
+      );
+    }
+
+    final imageProvider = user.profileUrl!.startsWith("http")
+        ? NetworkImage(user.profileUrl!)
+        : FileImage(File(user.profileUrl!)) as ImageProvider;
+
+    return CircleAvatar(
+      radius: 22,
+      backgroundColor: AppColors.grey,
+      backgroundImage: imageProvider,
     );
   }
 }
