@@ -1,6 +1,7 @@
 import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:chatapp/app/data/model/group_message_model.dart';
 import 'package:chatapp/app/data/repository/group_repo.dart';
 import 'package:flutter/material.dart';
@@ -141,17 +142,7 @@ class _GroupDetailPageState extends State<GroupDetailPage> {
         title: Row(
           children: [
             const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 18,
-              backgroundColor: AppColors.grey,
-              backgroundImage:
-                  widget.profileUrl != null && widget.profileUrl!.isNotEmpty
-                  ? NetworkImage(widget.profileUrl!)
-                  : null,
-              child: widget.profileUrl == null || widget.profileUrl!.isEmpty
-                  ? const Icon(Icons.person, color: AppColors.white)
-                  : null,
-            ),
+            ProfileAvatar(imageUrl: widget.profileUrl),
             const SizedBox(width: 10),
             Expanded(
               child: Text(

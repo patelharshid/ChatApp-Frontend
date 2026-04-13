@@ -87,9 +87,11 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         nameController.text.trim(),
         statusController.text.trim(),
         bioController.text.trim(),
-        selectedImage?.path ?? profileUrl
+        selectedImage?.path ?? profileUrl,
       );
-
+      await CommonService.setProfileUrl(
+        res['data']['profileUrl'] ?? profileUrl,
+      );
       await CommonService.setUserId(res['data']['userId'].toString());
 
       if (!mounted) return;

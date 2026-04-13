@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:chatapp/app/UI/chat/chat_detail_screen.dart';
 import 'package:chatapp/app/UI/group/groupPage.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
@@ -83,9 +82,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
                       onTap: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (_) => const GroupPage(),
-                          ),
+                          MaterialPageRoute(builder: (_) => const GroupPage()),
                         );
                       },
                     );
@@ -148,29 +145,11 @@ class _ContactListScreenState extends State<ContactListScreen> {
           vertical: AppConstants.paddingSM,
         ),
         decoration: const BoxDecoration(
-          border: Border(
-            bottom: BorderSide(color: AppColors.grey, width: 0.3),
-          ),
+          border: Border(bottom: BorderSide(color: AppColors.grey, width: 0.3)),
         ),
         child: Row(
           children: [
-            /// 🔹 Avatar
-            CircleAvatar(
-              radius: 24,
-              backgroundColor: isGroup ? AppColors.primary : AppColors.grey,
-              backgroundImage: (!isGroup &&
-                      imageUrl != null &&
-                      imageUrl.isNotEmpty)
-                  ? (imageUrl.startsWith("http")
-                          ? NetworkImage(imageUrl)
-                          : FileImage(File(imageUrl))) as ImageProvider
-                  : null,
-              child: isGroup
-                  ? const Icon(Icons.group_add, color: AppColors.black)
-                  : (imageUrl == null || imageUrl.isEmpty)
-                      ? const Icon(Icons.person, color: AppColors.lightText)
-                      : null,
-            ),
+            ProfileAvatar(imageUrl: imageUrl),
 
             const SizedBox(width: AppConstants.widthMD),
 

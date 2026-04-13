@@ -16,4 +16,6 @@ class AppUrls {
 
   static String createGroup() => "$baseUrl/group";
   static String groupMessage() => "$baseUrl/group";
+
+  static String saveSatus() => "$baseUrl/status";
 }

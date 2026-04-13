@@ -1,9 +1,8 @@
-import 'dart:io';
-
 import 'package:chatapp/app/core/services/common_service.dart';
 import 'package:chatapp/app/core/services/SocketService.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:chatapp/app/data/model/message_model.dart';
 import 'package:chatapp/app/data/repository/chat_reop.dart';
 import 'package:flutter/material.dart';
@@ -131,26 +130,6 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
     super.dispose();
   }
 
-  Widget _buildAvatar() {
-    if (widget.profileUrl == null || widget.profileUrl!.isEmpty) {
-      return const CircleAvatar(
-        radius: 18,
-        backgroundColor: AppColors.grey,
-        child: Icon(Icons.person, color: AppColors.white),
-      );
-    }
-
-    final image = widget.profileUrl!.startsWith("http")
-        ? NetworkImage(widget.profileUrl!)
-        : FileImage(File(widget.profileUrl!)) as ImageProvider;
-
-    return CircleAvatar(
-      radius: 18,
-      backgroundColor: AppColors.grey,
-      backgroundImage: image,
-    );
-  }
-
   Widget _buildMessageItem(MessageModel msg) {
     final isMe = msg.sentByMe;
 
@@ -190,7 +169,7 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         title: Row(
           children: [
             const SizedBox(width: AppConstants.widthXS),
-            _buildAvatar(),
+            ProfileAvatar(imageUrl: widget.profileUrl),
             const SizedBox(width: AppConstants.widthSM),
             Expanded(
               child: Text(

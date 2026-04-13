@@ -1,10 +1,9 @@
-import 'dart:io';
-
 import 'package:chatapp/app/UI/chat/chat_detail_screen.dart';
 import 'package:chatapp/app/UI/group/groupDetailPage.dart';
 import 'package:chatapp/app/core/helper/date_util.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:chatapp/app/data/model/chat_user_detail_model.dart';
 import 'package:chatapp/app/data/repository/chat_reop.dart';
 import 'package:flutter/material.dart';
@@ -115,7 +114,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
               ),
               child: Row(
                 children: [
-                  _buildProfileImage(user),
+                  ProfileAvatar(imageUrl: user.profileUrl),
 
                   const SizedBox(width: AppConstants.widthMD),
 
@@ -181,26 +180,6 @@ class _ChatListScreenState extends State<ChatListScreen> {
           );
         },
       ),
-    );
-  }
-
-  Widget _buildProfileImage(ChatUserDetailModel user) {
-    if (user.profileUrl == null || user.profileUrl!.isEmpty) {
-      return const CircleAvatar(
-        radius: 22,
-        backgroundColor: AppColors.grey,
-        child: Icon(Icons.person, color: Colors.white70),
-      );
-    }
-
-    final imageProvider = user.profileUrl!.startsWith("http")
-        ? NetworkImage(user.profileUrl!)
-        : FileImage(File(user.profileUrl!)) as ImageProvider;
-
-    return CircleAvatar(
-      radius: 22,
-      backgroundColor: AppColors.grey,
-      backgroundImage: imageProvider,
     );
   }
 }

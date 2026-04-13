@@ -1,5 +1,5 @@
 import 'package:chatapp/app/UI/chat/chat_list_screen.dart';
-import 'package:chatapp/app/UI/status/statusListPage.dart';
+import 'package:chatapp/app/UI/status/status_list_screen.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:flutter/material.dart';
 
@@ -53,7 +53,7 @@ class TabSectionState extends State<TabSection>
             controller: controller,
             children: [
               ChatListScreen(),
-              StatusListPage(),
+              StatusListScreen(),
               const Center(
                 child: Text(
                   "Calls page",

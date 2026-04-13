@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:chatapp/app/UI/auth/home_screen.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/widget/ch_button.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:chatapp/app/data/model/user_detail_model.dart';
 import 'package:chatapp/app/data/repository/group_repo.dart';
 import 'package:chatapp/app/data/repository/login_repo.dart';
@@ -303,22 +304,7 @@ class _GroupPageState extends State<GroupPage> {
                   child: ListTile(
                     leading: Stack(
                       children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundImage: user.profileUrl != null
-                              ? (user.profileUrl!.startsWith("http")
-                                        ? NetworkImage(user.profileUrl!)
-                                        : FileImage(File(user.profileUrl!)))
-                                    as ImageProvider
-                              : null,
-                          backgroundColor: AppColors.grey,
-                          child: user.profileUrl == null
-                              ? const Icon(
-                                  Icons.person,
-                                  color: AppColors.white,
-                                )
-                              : null,
-                        ),
+                        ProfileAvatar(imageUrl: user.profileUrl),
                         if (isSelected)
                           Positioned(
                             bottom: 0,

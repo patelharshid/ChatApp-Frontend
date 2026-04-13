@@ -21,6 +21,16 @@ class CommonService {
     return prefs.getString('UserId');
   }
 
+    static Future<void> setProfileUrl(String profileUrl) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('ProfileUrl', profileUrl);
+  }
+
+  static Future<String?> getProfileUrl() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getString('ProfileUrl');
+  }
+
   static Future<void> clearSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.clear();
