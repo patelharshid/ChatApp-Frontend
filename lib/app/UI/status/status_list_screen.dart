@@ -1,14 +1,16 @@
 import 'dart:io';
-import 'package:chatapp/app/core/helper/date_util.dart';
-import 'package:chatapp/app/data/model/status_detail_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'package:chatapp/app/UI/status/status_view_screen.dart';
 import 'package:chatapp/app/UI/status/status_preview_screen.dart';
-import 'package:chatapp/app/core/widget/profile_avatar.dart';
-import 'package:chatapp/app/data/repository/status_repo.dart';
+import 'package:chatapp/app/core/helper/date_util.dart';
 import 'package:chatapp/app/core/services/common_service.dart';
+import 'package:chatapp/app/core/widget/profile_avatar.dart';
 import 'package:chatapp/app/core/values/app_colors.dart';
 import 'package:chatapp/app/core/values/app_constants.dart';
+import 'package:chatapp/app/data/model/status_detail_model.dart';
+import 'package:chatapp/app/data/repository/status_repo.dart';
 
 class StatusListScreen extends StatefulWidget {
   const StatusListScreen({super.key});
@@ -56,10 +58,15 @@ class _StatusListScreenState extends State<StatusListScreen> {
   }
 
   @override
-  @override
   Widget build(BuildContext context) {
     final myStatus = statusList.where((e) => e.isMe).toList();
     final otherStatus = statusList.where((e) => !e.isMe).toList();
+
+    Map<int, List<StatusDetailModel>> groupedStatus = {};
+    for (var status in otherStatus) {
+      groupedStatus.putIfAbsent(status.userId, () => []);
+      groupedStatus[status.userId]!.add(status);
+    }
 
     return isLoading
         ? const Center(
@@ -69,30 +76,28 @@ class _StatusListScreenState extends State<StatusListScreen> {
             children: [
               ListTile(
                 leading: Stack(
+                  alignment: Alignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(2),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: myStatus.isNotEmpty && !myStatus.first.isViewed
-                              ? AppColors.primary
-                              : AppColors.background,
-                          width: 2,
+                    if (myStatus.isNotEmpty)
+                      CustomPaint(
+                        size: const Size(50, 50),
+                        painter: StatusBorderPainter(
+                          total: myStatus.length,
+                          viewedCount: myStatus.where((e) => e.isViewed).length,
                         ),
                       ),
-                      child: CircleAvatar(
-                        radius: 22,
-                        backgroundImage: myStatus.isNotEmpty
-                            ? (myStatus.first.contentUrl.startsWith("http")
-                                  ? NetworkImage(myStatus.first.contentUrl)
-                                  : FileImage(File(myStatus.first.contentUrl))
-                                        as ImageProvider)
-                            : null,
-                        child: myStatus.isEmpty
-                            ? ProfileAvatar(imageUrl: profileUrl)
-                            : null,
-                      ),
+
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundImage: myStatus.isNotEmpty
+                          ? (myStatus.first.contentUrl.startsWith("http")
+                                ? NetworkImage(myStatus.first.contentUrl)
+                                : FileImage(File(myStatus.first.contentUrl))
+                                      as ImageProvider)
+                          : null,
+                      child: myStatus.isEmpty
+                          ? ProfileAvatar(imageUrl: profileUrl)
+                          : null,
                     ),
 
                     Positioned(
@@ -124,10 +129,13 @@ class _StatusListScreenState extends State<StatusListScreen> {
                   style: const TextStyle(color: AppColors.lightText),
                 ),
                 onTap: () {
-                  final myStatus = statusList.where((e) => e.isMe).toList();
-
                   if (myStatus.isNotEmpty) {
-                    // 👁 View my status
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => StatusViewScreen(statusList: myStatus),
+                      ),
+                    );
                   } else {
                     _showStatusOptions();
                   }
@@ -136,7 +144,7 @@ class _StatusListScreenState extends State<StatusListScreen> {
 
               const SizedBox(height: AppConstants.heightSM),
 
-              if (otherStatus.isNotEmpty)
+              if (groupedStatus.isNotEmpty)
                 const Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: AppConstants.paddingMD,
@@ -152,35 +160,51 @@ class _StatusListScreenState extends State<StatusListScreen> {
 
               const SizedBox(height: 10),
 
-              ...otherStatus.map((status) {
+              ...groupedStatus.entries.map((entry) {
+                final userStatuses = entry.value;
+                final firstStatus = userStatuses.first;
+
                 return ListTile(
-                  leading: Container(
-                    padding: const EdgeInsets.all(2),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: status.isViewed
-                            ? AppColors.grey
-                            : AppColors.primary,
-                        width: 2,
+                  leading: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      CustomPaint(
+                        size: const Size(50, 50),
+                        painter: StatusBorderPainter(
+                          total: userStatuses.length,
+                          viewedCount: userStatuses
+                              .where((e) => e.isViewed)
+                              .length,
+                        ),
                       ),
-                    ),
-                    child: CircleAvatar(
-                      radius: 22,
-                      backgroundImage: status.contentUrl.startsWith("http")
-                          ? NetworkImage(status.contentUrl)
-                          : FileImage(File(status.contentUrl)) as ImageProvider,
-                    ),
+
+                      CircleAvatar(
+                        radius: 22,
+                        backgroundImage:
+                            firstStatus.contentUrl.startsWith("http")
+                            ? NetworkImage(firstStatus.contentUrl)
+                            : FileImage(File(firstStatus.contentUrl))
+                                  as ImageProvider,
+                      ),
+                    ],
                   ),
                   title: Text(
-                    status.userName,
+                    firstStatus.userName,
                     style: const TextStyle(color: AppColors.white),
                   ),
                   subtitle: Text(
-                    DateUtil.formatTime(status.createdDate),
+                    DateUtil.formatTime(firstStatus.createdDate),
                     style: const TextStyle(color: AppColors.lightText),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            StatusViewScreen(statusList: userStatuses),
+                      ),
+                    );
+                  },
                 );
               }),
             ],
@@ -236,8 +260,7 @@ class _StatusListScreenState extends State<StatusListScreen> {
   }
 
   Future<void> _openCamera() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-
+    final image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
       Navigator.push(
         context,
@@ -249,8 +272,7 @@ class _StatusListScreenState extends State<StatusListScreen> {
   }
 
   Future<void> _openGallery() async {
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
+    final image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       Navigator.push(
         context,
@@ -260,4 +282,47 @@ class _StatusListScreenState extends State<StatusListScreen> {
       );
     }
   }
+}
+
+class StatusBorderPainter extends CustomPainter {
+  final int total;
+  final int viewedCount;
+
+  StatusBorderPainter({required this.total, required this.viewedCount});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final strokeWidth = 2.0;
+    final radius = size.width / 2;
+
+    final rect = Rect.fromCircle(
+      center: Offset(radius, radius),
+      radius: radius,
+    );
+
+    final paint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = strokeWidth;
+
+    if (total == 1) {
+      paint.color = viewedCount == 1 ? Colors.grey : Colors.green;
+
+      canvas.drawArc(rect, 0, 2 * 3.14, false, paint);
+      return;
+    }
+
+    double startAngle = -90 * (3.14 / 180);
+    final sweep = (2 * 3.14) / total;
+
+    for (int i = 0; i < total; i++) {
+      paint.color = i < viewedCount ? Colors.grey : Colors.green;
+
+      canvas.drawArc(rect, startAngle, sweep - 0.1, false, paint);
+
+      startAngle += sweep;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }

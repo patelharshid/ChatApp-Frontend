@@ -2,6 +2,7 @@ class StatusDetailModel {
   final int statusId;
   final int userId;
   final String userName;
+  final String userProfileUrl;
   final String contentUrl;
   final String contentType;
   final String caption;
@@ -14,6 +15,7 @@ class StatusDetailModel {
     required this.statusId,
     required this.userId,
     required this.userName,
+    required this.userProfileUrl,
     required this.contentUrl,
     required this.contentType,
     required this.caption,
@@ -28,13 +30,14 @@ class StatusDetailModel {
       statusId: json['statusId'],
       userId: json['userId'],
       userName: json['userName'],
+      userProfileUrl: json['userProfileUrl'],
       contentUrl: json['contentUrl'],
       contentType: json['contentType'],
       caption: json['caption'] ?? '',
       createdDate: json['createdDate'],
       expiresDate: json['expiresDate'],
       isViewed: json['viewed'] ?? false,
-      isMe: json['sentByMe'] ?? false,
+      isMe: json['isMe'] ?? false,
     );
   }
 
@@ -44,6 +47,7 @@ class StatusDetailModel {
       "userId": userId,
       "userName": userName,
       "contentUrl": contentUrl,
+      "userProfileUrl": userProfileUrl,
       "contentType": contentType,
       "caption": caption,
       "createdDate": createdDate,

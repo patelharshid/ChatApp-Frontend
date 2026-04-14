@@ -28,4 +28,16 @@ class StatusRepo extends BaseRepo {
       rethrow;
     }
   }
+
+  Future<String> markAsViewed({required int statusId}) async {
+    try {
+      final res = await DioClient.getInstance().post(
+        AppUrls.markAsViewed(),
+        queryParameters: {"statusId": statusId},
+      );
+      return res.data['data'];
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

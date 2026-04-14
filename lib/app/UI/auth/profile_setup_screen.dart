@@ -64,9 +64,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
     if (nameController.text.trim().isEmpty) {
       return "Name is required";
     }
-    if (selectedImage == null) {
-      return "Profile image is required";
-    }
     return null;
   }
 
