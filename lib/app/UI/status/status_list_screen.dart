@@ -136,6 +136,7 @@ class _StatusListScreenState extends State<StatusListScreen> {
                         builder: (_) => StatusViewScreen(statusList: myStatus),
                       ),
                     );
+                    _loadStatus();
                   } else {
                     _showStatusOptions();
                   }
@@ -204,6 +205,7 @@ class _StatusListScreenState extends State<StatusListScreen> {
                             StatusViewScreen(statusList: userStatuses),
                       ),
                     );
+                    _loadStatus();
                   },
                 );
               }),
@@ -262,24 +264,30 @@ class _StatusListScreenState extends State<StatusListScreen> {
   Future<void> _openCamera() async {
     final image = await _picker.pickImage(source: ImageSource.camera);
     if (image != null) {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => StatusPreviewScreen(imageFile: File(image.path)),
         ),
       );
+      if (result == true) {
+        _loadStatus();
+      }
     }
   }
 
   Future<void> _openGallery() async {
     final image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
-      Navigator.push(
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => StatusPreviewScreen(imageFile: File(image.path)),
         ),
       );
+      if (result == true) {
+        _loadStatus();
+      }
     }
   }
 }

@@ -44,7 +44,7 @@ class _StatusPreviewScreenState extends State<StatusPreviewScreen> {
         caption: caption,
       );
 
-      Navigator.pop(context);
+      Navigator.pop(context, true);
     } catch (e) {
       print("Error: $e");
     }
